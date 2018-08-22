@@ -71,8 +71,8 @@ function draw() {
         }
         //no paddle
         else {
-            document.getElementById('can1').style.backgroundColor = "#202020";
-            //setTimeout(function () {document.location.reload();}, 500);
+            document.getElementById('can1').style.backgroundColor = "#555555";
+            setTimeout(function () {document.location.reload();}, 500);
         }
     }
 
