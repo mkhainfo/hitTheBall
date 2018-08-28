@@ -38,11 +38,10 @@ document.addEventListener("touchstart", press, false);
 document.addEventListener("touchmove", hold, false);
 document.addEventListener("touchend", stop, false);
 
-var paddleM = rec.left + paddleX + paddleW/2;
-
 function press(e){
     //e.preventDefault();
     //e.stopPropagation();
+    var paddleM = rec.left + paddleX + paddleW/2;
     if (e.touches[0].clientX < paddleM){
         lPress = true;
     }
