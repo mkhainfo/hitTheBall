@@ -51,6 +51,18 @@ function hit(){
   score.innerHTML = i;
 }
 
+function miss(){
+  //bounce off the bottom - test mode
+  dx *= 1;
+  dy *= -1;
+  //game over
+  i = 0;
+  score.innerHTML = ":(";
+  document.getElementById('can1').style.backgroundColor = "#555555";
+  //refresh page
+  //setTimeout(function () {document.location.reload();}, 500);
+}
+
 //canvas
 function draw() {
     ctx.clearRect(0, 0, can.width, can.height);
@@ -70,44 +82,11 @@ function draw() {
     }
     //bottom
     else if(ballY + dy > can.height) {
-      /*//center to edges model CEM
-        //paddle center
-        if(ballX > paddleX + paddleX/3
-          && ballX < paddleX + paddleW - paddleX/3) {
-        dy *= -1.1;
-        dx *= 0.98;
-        contact();
-        }
-        //paddle sides
-        else if(ballX > paddleX && ballX < paddleX + paddleW){
-          dy *= -1.07;
-          dx *= 1.1;
-          contact();
-        }
-        //paddle edges
-        else if(ballX > paddleX - ballR && ballX < paddleX + paddleW + ballR){
-            dy *= -1.05;
-            dx *= 1.3;
-            contact();
-        } //end CEM*/
-
-      // left right model LRM
-        //left
-        if (ballX < paddleX + paddleW/2 && ballX > paddleX - ballR){
+        if (ballX < paddleX + paddleW + ballR && ballX > paddleX - ballR){
           hit();
         }
-        else if (ballX > paddleX + paddleW/2
-            && ballX < paddleX + paddleW + ballR){
-          hit();
-        } //end LRM
-        //no paddle
         else {
-          dx *= 1;
-          dy *= -1;
-          i = 0;
-          score.innerHTML = ":(";
-          document.getElementById('can1').style.backgroundColor = "#555555";
-          //setTimeout(function () {document.location.reload();}, 500);
+          miss();
         }
     }
 
@@ -117,49 +96,6 @@ function draw() {
     else if(lPress && paddleX > 0) {
     paddleX -= speed;
   }
-}//end canvas */
-
-//canvas test mode
-/*function draw() {
-    ctx.clearRect(0, 0, can.width, can.height);
-    drawBall();
-    drawPaddle();
-    ballX += dx;
-    ballY += dy;
-    //sides
-    if(ballX + dx > can.width - ballR || ballX + dx < ballR) {
-        dx *= -1;
-        dy *= 1;
-    }
-    //top
-    if(ballY + dy < ballR) {
-        dy *= -1;
-        dx *= 1;
-    }
-    //bottom
-    else if(ballY + dy > can.height) {
-      //bounce
-      dy *= -1;
-      dx *= 1;
-        //hit paddle
-        if(ballX > paddleX && ballX < paddleX + paddleW) {
-            i++;
-            document.getElementById("score").innerHTML = i;
-            contact();
-        }
-        //no paddle
-        else {
-          i = 0;
-          document.getElementById("score").innerHTML = ":(";
-        }
-    }
-
-    if(rPress && paddleX < can.width-paddleW) {
-    paddleX += speed;
-    }
-    else if(lPress && paddleX > 0) {
-    paddleX -= speed;
-  }
-} //end test mode */
+}//end canvas
 
 setInterval(draw, 10);
