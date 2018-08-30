@@ -47,7 +47,6 @@ function hit(){
   var dir = Math.sign(dx)
   dy *= -1.02;
   dx = -1 * dir * dy / Math.tan(oo);
-
   i++;
   score.innerHTML = i;
 }
