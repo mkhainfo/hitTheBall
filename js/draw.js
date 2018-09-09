@@ -74,7 +74,7 @@ function draw() {
     ballY += dy;
     //sides
     if(ballX + dx > can.width - ballR || ballX + dx < ballR) {
-        dy *= 0.99;
+        //dy *= 0.99;
         dx *= -0.97;
     }
     //top
