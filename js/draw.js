@@ -39,14 +39,17 @@ function drawPaddle() {
 }
 
 function hit(){
-  var xx = ballX - paddleX + paddleW/2;
-  var yy = ballY - can.height;
-  var dh = Math.sqrt(xx*xx + yy*yy);
-  //dh must be positive
-  var oo = Math.PI / 5 + Math.asin(ballR / dh);
-  var dir = Math.sign(dx)
-  dy *= -1.02;
-  dx = -1 * dir * dy / Math.tan(oo);
+  //hit ball
+  var paddleM = paddleX + paddleW/2;
+  var dist = Math.abs(paddleM - ballX);
+  var force = dist * 8 / paddleW;
+  dx *= force;
+  if(dx * force < 1){
+    dx /= Math.abs(dx);
+  }
+  dy *= -1.04;
+
+  //show score
   i++;
   score.innerHTML = i;
 }
@@ -73,7 +76,7 @@ function draw() {
     //sides
     if(ballX + dx > can.width - ballR || ballX + dx < ballR) {
         dy *= 0.99;
-        dx *= -0.98;
+        dx *= -0.97;
     }
     //top
     if(ballY + dy < ballR) {
