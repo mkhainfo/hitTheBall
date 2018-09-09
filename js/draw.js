@@ -56,14 +56,13 @@ function hit(){
 
 function miss(){
   //bounce off the bottom - test mode
-  dx *= 1;
-  dy *= -1;
+  //dy *= -1;
   //game over
   i = 0;
   score.innerHTML = ":(";
   document.getElementById('can1').style.backgroundColor = "#555555";
   //refresh page
-  //setTimeout(function () {document.location.reload();}, 500);
+  setTimeout(function () {document.location.reload();}, 500);
 }
 
 //canvas
