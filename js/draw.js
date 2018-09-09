@@ -47,7 +47,7 @@ function hit(){
   if(dx * force < 1){
     dx /= Math.abs(dx);
   }
-  dy *= -1.04;
+  dy *= -1.08;
 
   //show score
   i++;
@@ -79,7 +79,7 @@ function draw() {
     }
     //top
     if(ballY + dy < ballR) {
-        dy *= -1.01;
+        dy *= -1.02;
         dx *= 0.98;
     }
     //bottom
