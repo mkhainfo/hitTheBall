@@ -41,11 +41,11 @@ document.addEventListener("touchend", stop, false);
 function press(e){
     //e.preventDefault();
     //e.stopPropagation();
-    var paddleM = rec.left + paddleX + paddleW/2;
-    if (e.touches[0].clientX < paddleM){
+    var paddleMid = rec.left + paddleX + paddleW/2;
+    if (e.touches[0].clientX < paddleMid){
         lPress = true;
     }
-    else if (e.touches[0].clientX > paddleM){
+    else if (e.touches[0].clientX > paddleMid){
         rPress = true;
     }
     return false;

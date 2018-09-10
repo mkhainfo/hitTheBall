@@ -39,28 +39,30 @@ function drawPaddle() {
 }
 
 function hit(){
-  var xx = ballX - paddleX + paddleW/2;
-  var yy = ballY - can.height;
-  var dh = Math.sqrt(xx*xx + yy*yy);
-  //dh must be positive
-  var oo = Math.PI / 5 + Math.asin(ballR / dh);
-  var dir = Math.sign(dx)
-  dy *= -1.02;
-  dx = -1 * dir * dy / Math.tan(oo);
+  //hit ball
+  var paddleM = paddleX + paddleW/2;
+  var dist = Math.abs(paddleM - ballX);
+  var force = dist * 12 / paddleW;
+  dx *= force;
+  if(dx * force < 1){
+    dx /= Math.abs(dx);
+  }
+  dy *= -1.10;
+
+  //show score
   i++;
   score.innerHTML = i;
 }
 
 function miss(){
   //bounce off the bottom - test mode
-  dx *= 1;
-  dy *= -1;
+  //dy *= -1;
   //game over
   i = 0;
   score.innerHTML = ":(";
   document.getElementById('can1').style.backgroundColor = "#555555";
   //refresh page
-  //setTimeout(function () {document.location.reload();}, 500);
+  setTimeout(function () {document.location.reload();}, 500);
 }
 
 //canvas
@@ -72,13 +74,11 @@ function draw() {
     ballY += dy;
     //sides
     if(ballX + dx > can.width - ballR || ballX + dx < ballR) {
-        dy *= 0.99;
-        dx *= -0.98;
+        dx *= -0.99;
     }
     //top
     if(ballY + dy < ballR) {
-        dy *= -1.01;
-        dx *= 0.98;
+        dy *= -1.05;
     }
     //bottom
     else if(ballY + dy > can.height) {
