@@ -42,12 +42,12 @@ function hit(){
   //hit ball
   var paddleM = paddleX + paddleW/2;
   var dist = Math.abs(paddleM - ballX);
-  var force = dist * 10 / paddleW;
+  var force = dist * 12 / paddleW;
   dx *= force;
   if(dx * force < 1){
     dx /= Math.abs(dx);
   }
-  dy *= -1.1;
+  dy *= -1.12;
 
   //show score
   i++;
@@ -78,7 +78,7 @@ function draw() {
     }
     //top
     if(ballY + dy < ballR) {
-        dy *= -1.05;
+        dy *= -1.06;
     }
     //bottom
     else if(ballY + dy > can.height) {
