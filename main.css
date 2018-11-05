@@ -1,19 +1,9 @@
-#can1 {
-    background-color: #000000;
-    display: block;
-    margin: 1vh auto;
-    z-index: 0;
+#view {
+  overflow: hidden;
 }
+#bound {
+  background-color:red;
+  margin: 0;
+  padding: 0;
 
-#score {
-  position: absolute;
-  left:0;
-  right:0;
-  z-index: 1;
-  margin:6vh auto;
-  color: #e2e2e2;
-  font-family: monospace;
-  font-size: 5vh;
-  font-weight: bolder;
-  text-align: center;
 }
