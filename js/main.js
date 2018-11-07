@@ -54,11 +54,30 @@ function setBall() {
   setAtt(ball, ballAtt)
 }
 
-window.addEventListener('load', set, false)
-window.addEventListener('resize', set, false)
+function moveBall() {
+  var cell = document.getElementById("cell")
+  var ball = document.getElementById("ball")
+  var x = parseInt(ball.getAttribute("cx"), 10)
+  var y = parseInt(ball.getAttribute("cy"), 10)
+  var ballAtt = {}
+  //you are here~~ create bounce conditions for ball + cell
+  var rake = false
+  if (rake) {
+      console.log("rake")
+  } else {
+    ballAtt.cx = x + 1
+    ballAtt.cy = y + 1
+  }
+  setAtt(ball, ballAtt)
+}
 
 function set() {
   setBound()
   setCell()
   setBall()
+  //moveBall()
 }
+
+window.addEventListener('load', set, false)
+window.addEventListener('resize', set, false)
+window.setInterval(moveBall, 10)
