@@ -95,11 +95,23 @@ class Game extends Component {
   }
 
   movePaddle = (e) => {
-    let x
+    let x, move
     e.type !== 'mousemove'? x = e.touches.clientX : x = e.clientX
-    let move = update(this.state.paddle, {
-      x: {$set: x - this.state.paddle.w / 2 },
-      })
+    let pad = this.state.paddle.w / 2
+    let margin = (this.state.svg.w - this.state.cell.w) / 2 + pad
+    if (x < margin) {
+      move = update(this.state.paddle, {
+        x: {$set: margin - pad},
+        })
+    } else if (x > this.state.svg.w - margin) {
+      move = update(this.state.paddle, {
+        x: {$set: this.state.svg.w - margin - pad },
+        })
+    } else {
+      move = update(this.state.paddle, {
+        x: {$set: x - pad },
+        })
+    }
     this.setState({ paddle: move })
   }
 
