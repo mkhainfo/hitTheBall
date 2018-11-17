@@ -7,9 +7,8 @@ class Game extends Component {
     this.state = {
       svg: {},
       cell: {},
-      ball: {
-        fill: '#eeeeee',
-      },
+      paddle: {},
+      ball: {},
     }
   }
 
@@ -27,7 +26,7 @@ class Game extends Component {
       h: {$set: get.h},
       box: {$set: [0, 0, get.w, get.h].join(' ')}
     })
-    this.setState({ svg: svg, })
+    this.setState({ svg: svg })
   }
 
   setCell = () => {
@@ -41,7 +40,20 @@ class Game extends Component {
       y: {$set: (get.h - h) / 2},
     })
     this.setState({cell: cell})
-    //this.setState( state => ({cell: cell,}))
+  }
+
+  setPaddle = () => {
+    let get = this.getWindow()
+    let w = get.w / 9
+    let h = get.h / 60
+    let cell = this.state.cell
+    let paddle = update(this.state.paddle, {
+      w: {$set: w},
+      h: {$set: h},
+      x: {$set: (get.w - w) / 2},
+      y: {$set: cell.h + (get.h - cell.h) / 2 - h},
+    })
+    this.setState({paddle: paddle})
   }
 
   setBall = () => {
@@ -60,7 +72,6 @@ class Game extends Component {
   moveBall = () => {
     let cell = this.state.cell
     let ball = this.state.ball
-
     let bounce = ball
 
     if ( ball.x + ball.dx < cell.x
@@ -83,10 +94,15 @@ class Game extends Component {
     this.setState({ ball: move })
   }
 
+  movePaddle = (event) => {
+
+  }
+
   setGame = () => {
     this.setBound()
-    this.setBall()
     this.setCell()
+    this.setBall()
+    setTimeout(this.setPaddle)
   }
 
   componentDidMount() {
@@ -99,21 +115,22 @@ class Game extends Component {
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.setGame)
+    window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
-///RENDER////////////////
   render() {
     return(
       <svg
         width={ this.state.svg.w } height={ this.state.svg.h }
-        viewBox={ this.state.svg.box }
-        style = {{ backgroundColor: 'white' }}
-        xmlns="http://www.w3.org/2000/svg">
+        viewBox={ this.state.svg.box } xmlns="http://www.w3.org/2000/svg" >
         <rect width={ this.state.cell.w } height={ this.state.cell.h }
-          x={ this.state.cell.x } y={ this.state.cell.y }/>
+          x={ this.state.cell.x } y={ this.state.cell.y } />
         <circle
           cx={ this.state.ball.x } cy={ this.state.ball.y }
-          r={ this.state.ball.r } fill={ this.state.ball.fill }/>
+          r={ this.state.ball.r } fill={ this.props.fill } />
+        <rect width={ this.state.paddle.w } height={ this.state.paddle.h }
+          x={ this.state.paddle.x } y={ this.state.paddle.y }
+          fill={ this.props.fill } />
       </svg>
     )
   }

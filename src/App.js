@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 //import update from 'immutability-helper'
-import Game from './Game.js'
+import Game from './game/Game.js'
 import './App.css'
 
 
@@ -13,7 +13,7 @@ class App extends Component {
   render() {
     return (
       <span id="view">
-        <Game />
+        <Game fill='#eeeeee' />
         <Score />
       </span>
     )
