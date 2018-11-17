@@ -94,8 +94,13 @@ class Game extends Component {
     this.setState({ ball: move })
   }
 
-  movePaddle = (event) => {
-
+  movePaddle = (e) => {
+    let x
+    e.type !== 'mousemove'? x = e.touches.clientX : x = e.clientX
+    let move = update(this.state.paddle, {
+      x: {$set: x - this.state.paddle.w / 2 },
+      })
+    this.setState({ paddle: move })
   }
 
   setGame = () => {
@@ -110,26 +115,32 @@ class Game extends Component {
     window.addEventListener('resize', this.setGame)
     window.setInterval(this.moveBall, 10)
   }
+
   shouldComponentUpdate(nextProps, nextState){
     return this.state !== nextState
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.setGame)
     window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
   render() {
+    let s = this.state
     return(
       <svg
-        width={ this.state.svg.w } height={ this.state.svg.h }
-        viewBox={ this.state.svg.box } xmlns="http://www.w3.org/2000/svg" >
-        <rect width={ this.state.cell.w } height={ this.state.cell.h }
-          x={ this.state.cell.x } y={ this.state.cell.y } />
-        <circle
-          cx={ this.state.ball.x } cy={ this.state.ball.y }
-          r={ this.state.ball.r } fill={ this.props.fill } />
-        <rect width={ this.state.paddle.w } height={ this.state.paddle.h }
-          x={ this.state.paddle.x } y={ this.state.paddle.y }
+        width={ s.svg.w } height={ s.svg.h }
+        viewBox={ s.svg.box }
+        onMouseMove={this.movePaddle} onTouchMove={this.movePaddle} >
+        <rect id='cell'
+          width={ s.cell.w } height={ s.cell.h }
+          x={ s.cell.x } y={ s.cell.y } />
+        <circle id='ball'
+          cx={ s.ball.x } cy={ s.ball.y }
+          r={ s.ball.r } fill={ this.props.fill } />
+        <rect id='paddle'
+          width={ s.paddle.w } height={ s.paddle.h }
+          x={ s.paddle.x } y={ s.paddle.y }
           fill={ this.props.fill } />
       </svg>
     )
