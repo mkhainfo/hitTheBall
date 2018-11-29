@@ -6,8 +6,9 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import React, { Component, } from 'react';
+import { Platform, StyleSheet, Text, View, Dimensions, } from 'react-native';
+import Svg, { Circle, Rect, } from 'react-native-svg';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -16,16 +17,25 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
+const { width, height } = Dimensions.get('window')
+
 type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Svg style={styles.svg} height={height} width={width}>
+          <Rect height='50' width='50'/>
+        </Svg>
       </View>
-    );
+    )
+  /*  return (
+      <View style={styles.container}>
+        <Svg style={styles.svg} height={height} width={width}>
+
+        </Svg>
+      </View>
+    );*/
   }
 }
 
@@ -34,16 +44,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#ffffff',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  svg: {
+    backgroundColor: '#00ff7d',
   },
 });
