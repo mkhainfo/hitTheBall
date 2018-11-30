@@ -13,8 +13,10 @@ class App extends Component {
   render() {
     return (
       <span id="view">
-        <Game fill='#eeeeee' />
-        <Score />
+        <Score style={styles.score} />
+        <div id="wrap" style={styles.game}>
+          <Game fill='#eeeeee' />
+        </div>
       </span>
     )
   }
@@ -30,9 +32,19 @@ class Score extends Component {
 
   render() {
     return (
-      <div />
+      <div id='score'><p>{this.state.score}</p></div>
     )
   }
 }
 
+const styles = {
+  score: {
+    color: '#ffffff',
+    textAlign: 'center',
+    zIndex: 2,
+  },
+  game: {
+    zIndex: 1,
+  },
+}
 export default App

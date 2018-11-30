@@ -12,7 +12,7 @@ class Game extends Component {
     }
   }
 
-  setBound = () => {
+  setSvg = () => {
     let w = window.innerWidth
     let h = window.innerHeight
     let svg = update(this.state.svg, {
@@ -63,21 +63,27 @@ class Game extends Component {
   }
 
   moveBall = () => {
-    let cell = this.state.cell
-    let ball = this.state.ball
-    let bounce = ball
+    let cell = this.state.cell, ball = this.state.ball,
+        pad = this.state.paddle, bounce = ball
 
     if ( ball.x + ball.dx - ball.r < cell.x
           || ball.x + ball.dx + ball.r > cell.x + cell.w) {
       bounce = update(ball, {
         dx: {$set: ball.dx * -1}
         })
-    } else if (ball.y + ball.dy - ball.r  < cell.y
-          || ball.y + ball.dy + ball.r  > cell.y + cell.h) {
+    } else if (ball.y + ball.dy - ball.r  < cell.y) {
       bounce = update(ball, {
         dy: {$set: ball.dy * -1}
         })
+/// A SIMPLE GAME OVER AND PADDLE BOUNCE ///
+    } else if ( ball.y + ball.r + ball.dy  > cell.y + cell.h - pad.h) {
+      let hit = ball.x + ball.r  < pad.x
+          || ball.x - ball.r > pad.x + pad.w ? 0 : -1
+      bounce = update(ball, {
+        dy: {$set: ball.dy * hit}
+        })
     }
+
 
     let move = update(bounce, {
       x: {$set: ball.x + ball.dx},
@@ -88,8 +94,8 @@ class Game extends Component {
   }
 
   movePaddle = (e) => {
-    let x, move
-    e.type !== 'mousemove'? x = e.touches.clientX : x = e.clientX
+    let move
+    let x = e.type !== 'mousemove'? e.touches.clientX : e.clientX
     let pad = this.state.paddle.w / 2
     let margin = (this.state.svg.w - this.state.cell.w) / 2 + pad
     if (x < margin) {
@@ -109,7 +115,7 @@ class Game extends Component {
   }
 
   setGame = () => {
-    this.setBound()
+    this.setSvg()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
     setTimeout(this.setPaddle, 1)
