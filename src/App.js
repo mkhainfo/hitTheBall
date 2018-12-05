@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import update from 'immutability-helper'
-//import Game from './game/Game.js'
 import './App.css'
 
 
@@ -27,6 +26,8 @@ getScore = (n) => {
   }
 }
 
+
+
 class Game extends Component {
   constructor(props) {
     super(props)
@@ -37,25 +38,15 @@ class Game extends Component {
         depth: 0,
         x: {
           length: 0,
-          top: {
-            x: 0,
-            y: 0,
-          },
-          bottom: {
-            x: 0,
-            y: 0,
-          },
+          x: 0,
+          top: {},
+          bottom: {},
         },
         y: {
           length: 0,
-          left: {
-            x: 0,
-            y: 0,
-          },
-          right: {
-            x: 0,
-            y: 0,
-          },
+          y: 0,
+          left: {},
+          right: {},
         },
       },
       ball: {},
@@ -86,37 +77,24 @@ class Game extends Component {
   }
 
   setPaddles = () => {
-    let svg = this.state.svg, cell = this.state.cell, size = 1/9,
-      depth = svg.size/100, wM = (svg.w / 2) - (svg.w * size / 2), hM = (svg.h / 2) - (svg.h * size / 2),
-      ready = update(this.state.paddles, {
-        depth: {$set: depth},
-        x: {  // fixed y
-          length: {$set: svg.w * size},
-          top: {
-            x: {$set: wM},
-            y: {$set: cell.y},
+    let svg = this.state.svg, cell = this.state.cell,
+        size = 1/9, depth = svg.size/100,
+        ready = update(this.state.paddles, {
+          depth: {$set: depth},
+          x: {
+            length: {$set: svg.w * size},
+            top: {y: {$set: cell.y}},
+            bottom: {y: {$set: cell.y + cell.h - depth}},
           },
-          bottom: {
-            x: {$set: wM},
-            y: {$set: cell.y + cell.h - depth},
+          y: {
+            length: {$set: svg.h * size},
+            left: {x: {$set: cell.x}},
+            right: {x: {$set: cell.x + cell.w - depth}},
           },
-        },
-        y: { // fixed x
-          length: {$set: svg.h * size},
-          left: {
-            x: {$set: cell.x},
-            y: {$set: hM},
-          },
-          right: {
-            x: {$set: cell.x + cell.w - depth},
-            y: {$set: hM},
-          },
-        },
-      })
+        })
     this.setState({paddles: ready})
   }
 
-  //returns an array length 4
   pickPaddles = () => {
     const printArr = (min, max) => {
       max = max === undefined ? min : max
@@ -127,7 +105,7 @@ class Game extends Component {
       let arrSum = arr.reduce( (a, b) => a + b )
       return min <= arrSum && arrSum <= max ? arr : printArr(min, max)
     }
-    let keys = printArr(2)
+    let keys = printArr(4)
     let on = update(this.state.paddles, {
       x: {
         top: {display: {$set: keys[0] ? 'on' : 'none'},},
@@ -155,44 +133,37 @@ class Game extends Component {
   }
 
   moveBall = () => {
-    let cell = this.state.cell, ball = this.state.ball, bounce = ball
-      //  pad = this.state.paddles, bounce = ball
+    let cell = this.state.cell, ball = this.state.ball, bounce = ball,
+        pad = this.state.paddles, dx = ball.dx, dy = ball.dy, score = this.state.score
 
-    //if the ball hits a vertical wall
+    // if the ball hits a vertical wall
     if ( ball.x + ball.dx - ball.r < cell.x
           || ball.x + ball.dx + ball.r > cell.x + cell.w) {
-      bounce = update(ball, {
-        dx: {$set: ball.dx * -1}
-        })
-
-    //if ball hits horizontal wall
+      dx *= -1
+    // if ball hits horizontal wall
     } else if (ball.y + ball.dy - ball.r  < cell.y
           || ball.y + ball.r + ball.dy > cell.y + cell.h ) {
-      bounce = update(ball, {
-        dy: {$set: ball.dy * -1}
-        })
+      dy *= -1
+    // if ball hits bottom paddle. paddle must be present.
+    } else if ( pad.x.bottom.display !== 'none'
+      && ball.y + ball.r + ball.dy > cell.y + cell.h - pad.depth) {
+      pad.x.x <= ball.x + ball.r && ball.x + ball.r <= pad.x.x + pad.x.length ?
+      dy *= -1 : dy = 0
+    }
 
-    // if ball hits a paddle. paddle must be present.
 
-  }/* else if ( ball.y + ball.r + ball.dy  > cell.y + cell.h - pad.h
-          && this.state.paddles.display !== 'none') {
-      let hit = ball.x + ball.r  < pad.x
-          || ball.x - ball.r > pad.x + pad.w ? 0 : -1
-      bounce = update(ball, {
-        dy: {$set: ball.dy * hit}
-        })
-      let score = hit ? this.state.score + 1 : ':('
-      this.setState({ score : score })
-      this.props.score(score)
-    }*/
 
+    bounce = update(ball, {
+      dx: {$set: dx},
+      dy: {$set: dy},
+      })
 
     let move = update(bounce, {
       x: {$set: ball.x + ball.dx},
       y: {$set: ball.y + ball.dy},
       })
 
-    this.setState({ ball: move })
+    this.setState({ ball: move, score: score })
   }
 
   movePaddles = (e) => {
@@ -204,24 +175,19 @@ class Game extends Component {
     x = x < cell.x ? cell.x : x > rightBound ? rightBound : x
     y = y < cell.y ? cell.y : y > lowerBound ? lowerBound : y
     let move = update(pad, {
-      x: {
-        top: { x: {$set: x} },
-        bottom: { x: {$set: x} },
-      },
-      y: {
-        left: { y: {$set: y} },
-        right: { y: {$set: y} },
-      },
+      x: {x: {$set: x}},
+      y: {y: {$set: y}},
     })
     this.setState({ paddles: move })
   }
 
   setGame = () => {
     this.setSvg()
+    this.pickPaddles()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
     setTimeout(this.setPaddles, 1)
-    setTimeout(this.pickPaddles, 1)
+    setTimeout(this.pickPaddles, 2)
   }
 
 //// this conditions should be triggered AFTER state is updated to score: ':('
@@ -239,12 +205,12 @@ class Game extends Component {
 ///// maybe it is triggered when the ball touches the paddle again ??
 /// in that case it would be a part of moveBall()
 
+
   componentDidMount() {
     this.setGame()
     window.addEventListener('resize', this.setGame)
     window.setInterval(this.moveBall, 10)
     window.addEventListener('mousemove', this.movePaddles)
-    window.addEventListener('resize', this.setGame)
   }
 
   shouldComponentUpdate(nextProps, nextState){
@@ -269,24 +235,26 @@ class Game extends Component {
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
           x={ s.cell.x } y={ s.cell.y } />
+
         <circle id='ball'
           cx={ s.ball.x } cy={ s.ball.y }
           r={ s.ball.r } fill={ this.props.fill } />
+
         <rect id='paddleXT' display={ pad.x.top.display }
           width={ pad.x.length } height={ pad.depth }
-          x={ pad.x.top.x } y={ pad.x.top.y }
+          x={ pad.x.x } y={ pad.x.top.y }
           fill={ this.props.fill } />
         <rect id='paddleXB' display={ pad.x.bottom.display }
           width={ pad.x.length } height={ pad.depth }
-          x={ pad.x.bottom.x } y={ pad.x.bottom.y }
+          x={ pad.x.x } y={ pad.x.bottom.y }
           fill={ this.props.fill } />
         <rect id='paddleYL' display={pad.y.left.display}
           width={ pad.depth } height={ pad.y.length }
-          x={ pad.y.left.x } y={ pad.y.left.y }
+          x={ pad.y.left.x } y={ pad.y.y }
           fill={ this.props.fill } />
         <rect id='paddleYR' display={pad.y.right.display}
             width={ pad.depth } height={ pad.y.length }
-            x={ pad.y.right.x } y={ pad.y.right.y }
+            x={ pad.y.right.x } y={ pad.y.y }
             fill={ this.props.fill } />
       </svg>
     )
