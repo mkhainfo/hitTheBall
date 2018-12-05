@@ -87,7 +87,7 @@ class Game extends Component {
 
   setPaddles = () => {
     let svg = this.state.svg, cell = this.state.cell, size = 1/9,
-      depth = svg.size/100, wM = svg.w / 2, hM = svg.h / 2,
+      depth = svg.size/100, wM = (svg.w / 2) - (svg.w * size / 2), hM = (svg.h / 2) - (svg.h * size / 2),
       ready = update(this.state.paddles, {
         depth: {$set: depth},
         x: {  // fixed y
@@ -116,31 +116,29 @@ class Game extends Component {
     this.setState({paddles: ready})
   }
 
-  ///toggles displayed paddles with an array with length 4
-  /*pickPaddles = () => {
-    let displayPaddles
-    let printArr = (min, max) => {
-      let a = []
-      let enabledPaddles = (arr) => (arr.filter(n => (n === 1)).length)
+  //returns an array length 4
+  pickPaddles = () => {
+    const printArr = (min, max) => {
+      max = max === undefined ? min : max
+      let arr = []
       for (let i = 0; i < 4; i++) {
-        a.push(Math.round(Math.random()))
+        arr.push(Math.round(Math.random()))
       }
-      return enabledPaddles(a) > min && enabledPaddles(a) < max ? displayPaddles = a : printArr(min, max)
+      let arrSum = arr.reduce( (a, b) => a + b )
+      return min <= arrSum && arrSum <= max ? arr : printArr(min, max)
     }
-
-  }*/
-
-  setPaddleB = () => {
-    let w = this.state.svg.w / 9, h = this.state.svg.h / 60
-    let cell = this.state.cell
-    let paddle = update(this.state.paddles, {
-      w: {$set: w},
-      h: {$set: h},
-      x: {$set: (this.state.svg.w - w) / 2},
-      y: {$set: cell.h + (this.state.svg.h - cell.h) / 2 - h},
-      display: {$set: 'none'},
+    let keys = printArr(2)
+    let on = update(this.state.paddles, {
+      x: {
+        top: {display: {$set: keys[0] ? 'on' : 'none'},},
+        bottom: {display: {$set: keys[1] ? 'on' : 'none'},},
+      },
+      y: {
+        left: {display: {$set: keys[2] ? 'on' : 'none'},},
+        right: {display: {$set: keys[3] ? 'on' : 'none'},},
+      },
     })
-    this.setState({paddles: paddle})
+    this.setState({paddles: on})
   }
 
   setBall = () => {
@@ -157,8 +155,8 @@ class Game extends Component {
   }
 
   moveBall = () => {
-    let cell = this.state.cell, ball = this.state.ball,
-        pad = this.state.paddles, bounce = ball
+    let cell = this.state.cell, ball = this.state.ball, bounce = ball
+      //  pad = this.state.paddles, bounce = ball
 
     //if the ball hits a vertical wall
     if ( ball.x + ball.dx - ball.r < cell.x
@@ -175,7 +173,8 @@ class Game extends Component {
         })
 
     // if ball hits a paddle. paddle must be present.
-    } else if ( ball.y + ball.r + ball.dy  > cell.y + cell.h - pad.h
+
+  }/* else if ( ball.y + ball.r + ball.dy  > cell.y + cell.h - pad.h
           && this.state.paddles.display !== 'none') {
       let hit = ball.x + ball.r  < pad.x
           || ball.x - ball.r > pad.x + pad.w ? 0 : -1
@@ -185,7 +184,7 @@ class Game extends Component {
       let score = hit ? this.state.score + 1 : ':('
       this.setState({ score : score })
       this.props.score(score)
-    }
+    }*/
 
 
     let move = update(bounce, {
@@ -196,7 +195,7 @@ class Game extends Component {
     this.setState({ ball: move })
   }
 
-  movePaddle = (e) => {
+  /*movePaddle = (e) => {
     let move
     let x = e.type !== 'mousemove'? e.touches.clientX : e.clientX
     let pad = this.state.paddles.w / 2
@@ -215,13 +214,14 @@ class Game extends Component {
         })
     }
     this.setState({ paddles: move })
-  }
+  }*/
 
   setGame = () => {
     this.setSvg()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
-    setTimeout(this.setPaddleB, 1)
+    setTimeout(this.setPaddles, 1)
+    setTimeout(this.pickPaddles, 1)
   }
 
 //// this conditions should be triggered AFTER state is updated to score: ':('
@@ -240,7 +240,6 @@ class Game extends Component {
 /// in that case it would be a part of moveBall()
 
   componentDidMount() {
-
     this.setGame()
     window.addEventListener('resize', this.setGame)
     window.setInterval(this.moveBall, 10)
@@ -255,23 +254,38 @@ class Game extends Component {
     window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
+
+// onMouseMove={this.movePaddle} onTouchMove={this.movePaddle}
   render() {
     let s = this.state
+    let pad = this.state.paddles
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
         viewBox={ s.svg.box }
-        onMouseMove={this.movePaddle} onTouchMove={this.movePaddle} >
+         >
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
           x={ s.cell.x } y={ s.cell.y } />
         <circle id='ball'
           cx={ s.ball.x } cy={ s.ball.y }
           r={ s.ball.r } fill={ this.props.fill } />
-        <rect id='paddle' display={s.paddles.display}
-          width={ s.paddles.w } height={ s.paddles.h }
-          x={ s.paddles.x } y={ s.paddles.y }
+        <rect id='paddleXT' display={ pad.x.top.display }
+          width={ pad.x.length } height={ pad.depth }
+          x={ pad.x.top.x } y={ pad.x.top.y }
           fill={ this.props.fill } />
+        <rect id='paddleXB' display={ pad.x.bottom.display }
+          width={ pad.x.length } height={ pad.depth }
+          x={ pad.x.bottom.x } y={ pad.x.bottom.y }
+          fill={ this.props.fill } />
+        <rect id='paddleYL' display={pad.y.left.display}
+          width={ pad.depth } height={ pad.y.length }
+          x={ pad.y.left.x } y={ pad.y.left.y }
+          fill={ this.props.fill } />
+        <rect id='paddleYR' display={pad.y.right.display}
+            width={ pad.depth } height={ pad.y.length }
+            x={ pad.y.right.x } y={ pad.y.right.y }
+            fill={ this.props.fill } />
       </svg>
     )
   }
