@@ -195,26 +195,26 @@ class Game extends Component {
     this.setState({ ball: move })
   }
 
-  /*movePaddle = (e) => {
-    let move
-    let x = e.type !== 'mousemove'? e.touches.clientX : e.clientX
-    let pad = this.state.paddles.w / 2
-    let margin = (this.state.svg.w - this.state.cell.w) / 2 + pad
-    if (x < margin) {
-      move = update(this.state.paddles, {
-        x: {$set: margin - pad},
-        })
-    } else if (x > this.state.svg.w - margin) {
-      move = update(this.state.paddles, {
-        x: {$set: this.state.svg.w - margin - pad },
-        })
-    } else {
-      move = update(this.state.paddles, {
-        x: {$set: x - pad },
-        })
-    }
+  movePaddles = (e) => {
+    let cell = this.state.cell, pad = this.state.paddles,
+      rightBound = cell.x + cell.w - pad.x.length,
+      lowerBound = cell.y + cell.h - pad.y.length
+    let [x, y] = e.type !== 'mousemove'?
+      [ e.touches.clientX, e.touches.clientY ] : [e.clientX, e.clientY]
+    x = x < cell.x ? cell.x : x > rightBound ? rightBound : x
+    y = y < cell.y ? cell.y : y > lowerBound ? lowerBound : y
+    let move = update(pad, {
+      x: {
+        top: { x: {$set: x} },
+        bottom: { x: {$set: x} },
+      },
+      y: {
+        left: { y: {$set: y} },
+        right: { y: {$set: y} },
+      },
+    })
     this.setState({ paddles: move })
-  }*/
+  }
 
   setGame = () => {
     this.setSvg()
@@ -243,6 +243,8 @@ class Game extends Component {
     this.setGame()
     window.addEventListener('resize', this.setGame)
     window.setInterval(this.moveBall, 10)
+    window.addEventListener('mousemove', this.movePaddles)
+    window.addEventListener('resize', this.setGame)
   }
 
   shouldComponentUpdate(nextProps, nextState){
