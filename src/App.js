@@ -35,16 +35,11 @@ class Game extends Component {
       svg: {},
       cell: {},
       paddles: {
-        depth: 0,
         x: {
-          length: 0,
-          x: 0,
           top: {},
           bottom: {},
         },
         y: {
-          length: 0,
-          y: 0,
           left: {},
           right: {},
         },
@@ -83,13 +78,13 @@ class Game extends Component {
           depth: {$set: depth},
           x: {
             length: {$set: svg.w * size},
-            top: {y: {$set: cell.y}},
-            bottom: {y: {$set: cell.y + cell.h - depth}},
+            top: {y: {$set: cell.y}, display: {$set: 'none'},},
+            bottom: {y: {$set: cell.y + cell.h - depth}, display: {$set: 'none'},},
           },
           y: {
             length: {$set: svg.h * size},
-            left: {x: {$set: cell.x}},
-            right: {x: {$set: cell.x + cell.w - depth}},
+            left: {x: {$set: cell.x}, display: {$set: 'none'},},
+            right: {x: {$set: cell.x + cell.w - depth}, display: {$set: 'none'},},
           },
         })
     this.setState({paddles: ready})
@@ -105,7 +100,21 @@ class Game extends Component {
       let arrSum = arr.reduce( (a, b) => a + b )
       return min <= arrSum && arrSum <= max ? arr : printArr(min, max)
     }
-    let keys = printArr(4)
+
+    // keys sets up "level" conditions based on score
+    let keys
+    if (this.state.score === ':(') {
+      keys = [0,0,0,0]
+    } else if (this.state.score < 2) {
+      keys = [0,1,0,0]
+    } else if (this.state.score < 6) {
+      keys = printArr(1)
+    } else if (this.state.score < 10) {
+      keys = printArr(1, 2)
+    } else if (this.state.score < 15) {
+      keys = printArr(2, 3)
+    } else { keys = printArr(3, 4)}
+
     let on = update(this.state.paddles, {
       x: {
         top: {display: {$set: keys[0] ? 'on' : 'none'},},
@@ -125,33 +134,52 @@ class Game extends Component {
       x: {$set: svg.w/2},
       y: {$set: svg.h/2},
       r: {$set: svg.size/100},
-      dx: {$set: svg.size/700},
-      dy: {$set: svg.size/700},
+      dx: {$set: svg.size/500},
+      dy: {$set: svg.size/500},
       })
 
     this.setState({ ball: ball })
   }
 
   moveBall = () => {
+
     let cell = this.state.cell, ball = this.state.ball, bounce = ball,
         pad = this.state.paddles, dx = ball.dx, dy = ball.dy, score = this.state.score
 
     // if the ball hits a vertical wall
-    if ( ball.x + ball.dx - ball.r < cell.x
+    if ( ball.x + dx - ball.r < cell.x
           || ball.x + ball.dx + ball.r > cell.x + cell.w) {
       dx *= -1
     // if ball hits horizontal wall
-    } else if (ball.y + ball.dy - ball.r  < cell.y
+  } else if (ball.y + dy - ball.r  < cell.y
           || ball.y + ball.r + ball.dy > cell.y + cell.h ) {
       dy *= -1
     // if ball hits bottom paddle. paddle must be present.
-    } else if ( pad.x.bottom.display !== 'none'
-      && ball.y + ball.r + ball.dy > cell.y + cell.h - pad.depth) {
-      pad.x.x <= ball.x + ball.r && ball.x + ball.r <= pad.x.x + pad.x.length ?
-      dy *= -1 : dy = 0
+  } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display !== 'none' )
+    || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display !== 'none' )) {
+    if (pad.x.x <= ball.x - ball.r + dx && ball.x + ball.r + dx <= pad.x.x + pad.x.length) {
+      dy *= -1
+      score += 1
+      this.props.score(score)
+      this.pickPaddles()
+    } else {
+      dy = 0
+      score = ':('
+      this.props.score(score)
     }
-
-
+  } else if (( ball.x - ball.r + dx <= cell.x + pad.depth && pad.y.left.display !== 'none' )
+    || ( ball.x + ball.r + dx >= cell.x + cell.w - pad.depth && pad.y.right.display !== 'none' )) {
+    if (pad.y.y <= ball.y - ball.r + dx && ball.y + ball.r + dy <= pad.y.y + pad.y.length) {
+      dx *= -1
+      score += 1
+      this.props.score(score)
+      this.pickPaddles()
+    } else {
+      dx = 0
+      score = ':('
+      this.props.score(score)
+    }
+  }
 
     bounce = update(ball, {
       dx: {$set: dx},
@@ -164,30 +192,31 @@ class Game extends Component {
       })
 
     this.setState({ ball: move, score: score })
+    if (this.state.score === ':(') {this.pickPaddles()}
   }
 
   movePaddles = (e) => {
     let cell = this.state.cell, pad = this.state.paddles,
-      rightBound = cell.x + cell.w - pad.x.length,
-      lowerBound = cell.y + cell.h - pad.y.length
-    let [x, y] = e.type !== 'mousemove'?
-      [ e.touches.clientX, e.touches.clientY ] : [e.clientX, e.clientY]
-    x = x < cell.x ? cell.x : x > rightBound ? rightBound : x
-    y = y < cell.y ? cell.y : y > lowerBound ? lowerBound : y
+      halfX = pad.x.length / 2, halfY = pad.y.length / 2,
+      rightBound = cell.x + cell.w - halfX,
+      lowerBound = cell.y + cell.h - halfY,
+      [x, y] = e.type !== 'mousemove'?
+        [ e.touches.clientX, e.touches.clientY ] : [ e.clientX, e.clientY ]
+    x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
+    y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
     let move = update(pad, {
-      x: {x: {$set: x}},
-      y: {y: {$set: y}},
+      x: {x: {$set: x }},
+      y: {y: {$set: y }},
     })
     this.setState({ paddles: move })
+
   }
 
   setGame = () => {
     this.setSvg()
-    this.pickPaddles()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
     setTimeout(this.setPaddles, 1)
-    setTimeout(this.pickPaddles, 2)
   }
 
 //// this conditions should be triggered AFTER state is updated to score: ':('
@@ -230,7 +259,7 @@ class Game extends Component {
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
-        viewBox={ s.svg.box }
+        viewBox={ s.svg.box } onClick={ this.pickPaddles }
          >
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
