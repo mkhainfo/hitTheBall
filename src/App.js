@@ -154,7 +154,7 @@ class Game extends Component {
   } else if (ball.y + dy - ball.r  < cell.y
           || ball.y + ball.r + ball.dy > cell.y + cell.h ) {
       dy *= -1
-    // if ball hits bottom paddle. paddle must be present.
+    // if ball hits x paddle. paddle must be present.
   } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display !== 'none' )
     || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display !== 'none' )) {
     if (pad.x.x <= ball.x - ball.r + dx && ball.x + ball.r + dx <= pad.x.x + pad.x.length) {
@@ -167,6 +167,7 @@ class Game extends Component {
       score = ':('
       this.props.score(score)
     }
+    // if ball hits y paddle. paddle must be present.
   } else if (( ball.x - ball.r + dx <= cell.x + pad.depth && pad.y.left.display !== 'none' )
     || ( ball.x + ball.r + dx >= cell.x + cell.w - pad.depth && pad.y.right.display !== 'none' )) {
     if (pad.y.y <= ball.y - ball.r + dx && ball.y + ball.r + dy <= pad.y.y + pad.y.length) {
@@ -192,7 +193,6 @@ class Game extends Component {
       })
 
     this.setState({ ball: move, score: score })
-    if (this.state.score === ':(') {this.pickPaddles()}
   }
 
   movePaddles = (e) => {
@@ -209,7 +209,6 @@ class Game extends Component {
       y: {y: {$set: y }},
     })
     this.setState({ paddles: move })
-
   }
 
   setGame = () => {
@@ -219,21 +218,15 @@ class Game extends Component {
     setTimeout(this.setPaddles, 1)
   }
 
-//// this conditions should be triggered AFTER state is updated to score: ':('
-//////     where do i put it?
-  /*  if (this.state.score === ':(') {
-      let reset = () => {
-        this.setGame()
-        this.setState({ score : 0 })
-        this.props.score(0)
-      }
-      window.setTimeout(reset(), 3000)
-    }
-  }*/
-//////////   maybe in shouldComponentUpdate()? check the lifecycle graph
-///// maybe it is triggered when the ball touches the paddle again ??
-/// in that case it would be a part of moveBall()
+  resetGame = () => {
+    this.setGame()
+    this.setState({score: 0})
+    this.props.score(0)
+  }
 
+  handleClick = () => {
+    this.state.score === 'x' ? this.resetGame() : this.pickPaddles()
+  }
 
   componentDidMount() {
     this.setGame()
@@ -246,20 +239,25 @@ class Game extends Component {
     return this.state !== nextState
   }
 
+  componentDidUpdate() {
+    if (this.state.score === ':(') {
+      this.pickPaddles()
+      this.setState({score: 'x'})
+    }
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.setGame)
     window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
-
-// onMouseMove={this.movePaddle} onTouchMove={this.movePaddle}
   render() {
     let s = this.state
     let pad = this.state.paddles
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
-        viewBox={ s.svg.box } onClick={ this.pickPaddles }
+        viewBox={ s.svg.box } onClick={ this.handleClick }
          >
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
