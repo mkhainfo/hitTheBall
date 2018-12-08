@@ -7,9 +7,7 @@ import './App.css'
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      score: 0,
-    }
+    this.state = {}
   }
 
 getScore = (n) => {
@@ -25,8 +23,6 @@ getScore = (n) => {
     )
   }
 }
-
-
 
 class Game extends Component {
   constructor(props) {
@@ -107,8 +103,10 @@ class Game extends Component {
       keys = [0,0,0,0]
     } else if (this.state.score < 2) {
       keys = [0,1,0,0]
-    } else if (this.state.score < 6) {
+    } else if (this.state.score < 5) {
       keys = printArr(1)
+    } else if (this.state.score < 6) {
+      keys = printArr(2)
     } else if (this.state.score < 10) {
       keys = printArr(1, 2)
     } else if (this.state.score < 15) {
@@ -157,7 +155,7 @@ class Game extends Component {
     // if ball hits x paddle. paddle must be present.
   } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display !== 'none' )
     || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display !== 'none' )) {
-    if (pad.x.x <= ball.x - ball.r + dx && ball.x + ball.r + dx <= pad.x.x + pad.x.length) {
+    if (pad.x.x <= ball.x + ball.r + dx && ball.x - ball.r + dx <= pad.x.x + pad.x.length) {
       dy *= -1
       score += 1
       this.props.score(score)
@@ -170,7 +168,7 @@ class Game extends Component {
     // if ball hits y paddle. paddle must be present.
   } else if (( ball.x - ball.r + dx <= cell.x + pad.depth && pad.y.left.display !== 'none' )
     || ( ball.x + ball.r + dx >= cell.x + cell.w - pad.depth && pad.y.right.display !== 'none' )) {
-    if (pad.y.y <= ball.y - ball.r + dx && ball.y + ball.r + dy <= pad.y.y + pad.y.length) {
+    if (pad.y.y <= ball.y + ball.r + dx && ball.y - ball.r + dy <= pad.y.y + pad.y.length) {
       dx *= -1
       score += 1
       this.props.score(score)
@@ -212,20 +210,16 @@ class Game extends Component {
   }
 
   setGame = () => {
+    this.props.score('hit the ball')
+    this.setState({score: 0})
     this.setSvg()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
     setTimeout(this.setPaddles, 1)
   }
 
-  resetGame = () => {
-    this.setGame()
-    this.setState({score: 0})
-    this.props.score(0)
-  }
-
   handleClick = () => {
-    this.state.score === 'x' ? this.resetGame() : this.pickPaddles()
+    this.state.score === 'x' ? this.setGame() : this.pickPaddles()
   }
 
   componentDidMount() {
@@ -280,9 +274,9 @@ class Game extends Component {
           x={ pad.y.left.x } y={ pad.y.y }
           fill={ this.props.fill } />
         <rect id='paddleYR' display={pad.y.right.display}
-            width={ pad.depth } height={ pad.y.length }
-            x={ pad.y.right.x } y={ pad.y.y }
-            fill={ this.props.fill } />
+          width={ pad.depth } height={ pad.y.length }
+          x={ pad.y.right.x } y={ pad.y.y }
+          fill={ this.props.fill } />
       </svg>
     )
   }
