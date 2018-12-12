@@ -107,7 +107,7 @@ class Game extends Component {
       keys = printArr(1)
     } else if (this.state.score < 6) {
       keys = printArr(2)
-    } else if (this.state.score < 10) {
+    } else if (this.state.score < 7) {
       keys = printArr(1, 2)
     } else if (this.state.score < 15) {
       keys = printArr(2, 3)
