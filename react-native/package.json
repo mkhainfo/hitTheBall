@@ -1,0 +1,28 @@
+{
+  "name": "hitTheBall",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "immutability-helper": "^2.8.1",
+    "react": "16.6.1",
+    "react-native": "0.57.6",
+    "react-native-hooks": "0.0.6",
+    "react-native-svg": "^8.0.8"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-jest": "23.6.0",
+    "babel-preset-flow": "^6.23.0",
+    "flow-bin": "^0.78.0",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.49.2",
+    "react-test-renderer": "16.6.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
