@@ -32,12 +32,12 @@ class Game extends Component {
       cell: {},
       paddles: {
         x: {
-          top: {},
-          bottom: {},
+          top: { display: 'none' },
+          bottom: { display: 'none' },
         },
         y: {
-          left: {},
-          right: {},
+          left: { display: 'none' },
+          right: { display: 'none' },
         },
       },
       ball: {},
@@ -74,13 +74,13 @@ class Game extends Component {
           depth: {$set: depth},
           x: {
             length: {$set: svg.w * size},
-            top: {y: {$set: cell.y}, display: {$set: 'none'},},
-            bottom: {y: {$set: cell.y + cell.h - depth}, display: {$set: 'none'},},
+            top: {y: {$set: cell.y},},
+            bottom: {y: {$set: cell.y + cell.h - depth}, },
           },
           y: {
             length: {$set: svg.h * size},
-            left: {x: {$set: cell.x}, display: {$set: 'none'},},
-            right: {x: {$set: cell.x + cell.w - depth}, display: {$set: 'none'},},
+            left: {x: {$set: cell.x},},
+            right: {x: {$set: cell.x + cell.w - depth},},
           },
         })
     this.setState({paddles: ready})
@@ -198,8 +198,7 @@ class Game extends Component {
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
       lowerBound = cell.y + cell.h - halfY,
-      [x, y] = e.type !== 'mousemove'?
-        [ e.touches.clientX, e.touches.clientY ] : [ e.clientX, e.clientY ]
+      [x, y] = e.type === 'mousemove' ? ([ e.clientX, e.clientY ]) : ([ e.touches.clientX, e.touches.clientY ])
     x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
     y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
     let move = update(pad, {
@@ -207,11 +206,16 @@ class Game extends Component {
       y: {y: {$set: y }},
     })
     this.setState({ paddles: move })
+    return false
   }
 
   setGame = () => {
     this.props.score('hit the ball')
     this.setState({score: 0})
+    this.sizeGame()
+  }
+
+  sizeGame = () => {
     this.setSvg()
     setTimeout(this.setCell)
     setTimeout(this.setBall)
@@ -224,9 +228,10 @@ class Game extends Component {
 
   componentDidMount() {
     this.setGame()
-    window.addEventListener('resize', this.setGame)
-    window.setInterval(this.moveBall, 10)
+    window.addEventListener('resize', this.sizeGame)
     window.addEventListener('mousemove', this.movePaddles)
+    window.addEventListener('touchmove', this.movePaddles)
+    window.setInterval(this.moveBall, 10)
   }
 
   shouldComponentUpdate(nextProps, nextState){
@@ -241,7 +246,9 @@ class Game extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.setGame)
+    window.removeEventListener('resize', this.sizeGame)
+    window.removeEventListener('mousemove', this.movePaddles)
+    window.removeEventListener('touchmove', this.movePaddles)
     window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
