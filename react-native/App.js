@@ -19,15 +19,16 @@ const instructions = Platform.select({
 });
 
 
-type Props = {};
-export default class App extends Component<Props> {
-  constructor(props) {
-    super(props)
-    this.state = {
-    }
+//type Props = {};
+//type State = { score: Number || String};
+export default class App extends Component<{},{score: any}> {
+
+  state = {
+    score: 'hit the ball',
   }
 
-  getScore = (n) => {
+
+  getScore = (n: any) => {
     this.setState({ score : n })
   }
 
@@ -42,26 +43,86 @@ export default class App extends Component<Props> {
   }
 }
 
-class Game extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      svg: {},
-      cell: {},
+type Props = {
+  score: any,
+  fill: string,
+}
+type State = {
+  svg: {
+    w: number,
+    h: number,
+    box: string,
+    size: number,
+    },
+  cell: {
+    x: number,
+    y: number,
+    h: number,
+    w: number,
+    },
+  paddles: {
+    depth: number,
+    x: {
+      x: number,
+      length: number,
+      top: { y: number, display: string, },
+      bottom: { y: number, display: string, },
+    },
+    y: {
+      y: number,
+      length: number,
+      left: { x: number, display: string, },
+      right: { x: number, display: string, },
+    },
+  },
+  ball: {
+    x: number,
+    y: number,
+    r: number,
+    dx: number,
+    dy: number,
+    },
+  score: any,
+}
+class Game extends Component<Props, State> {
+state = {
+      svg: {
+        w: 0,
+        h: 0,
+        box: '0 0 0 0',
+        size:0,
+        },
+      cell: {
+        x: 0,
+        y: 0,
+        h: 0,
+        w: 0,
+        },
       paddles: {
+        depth: 0,
         x: {
-          top: { display: 'none' },
-          bottom: { display: 'none' },
+          x: 0,
+          length: 0,
+          top: { y: 0, display: 'none', },
+          bottom: { y: 0, display: 'none', },
         },
         y: {
-          left: { display: 'none' },
-          right: { display: 'none' },
+          y: 0,
+          length: 0,
+          left: { x: 0, display: 'none', },
+          right: { x: 0, display: 'none', },
         },
       },
-      ball: {},
+      ball: {
+        x: 0,
+        y: 0,
+        r: 0,
+        dx: 0,
+        dy: 0,
+        },
       score: 0,
     }
-  }
+
 
   setSvg = () => {
     const { width, height } = Dimensions.get('window')
@@ -284,20 +345,8 @@ class Game extends Component {
   }
 }
 
-class Score extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-    }
-  }
-
-  render() {
-    return (
-      <Text style={styles.score}>
-        {this.props.score}
-      </Text>
-    )
-  }
+function Score(props: {score: any}) {
+    return <Text style={styles.score}>{props.score}</Text>
 }
 
 const styles = StyleSheet.create({
