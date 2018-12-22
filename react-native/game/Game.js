@@ -28,14 +28,14 @@ type State = {
     x: {
       x: number,
       length: number,
-      top: { y: number, display: string, },
-      bottom: { y: number, display: string, },
+      top: { y: number, display: number, },
+      bottom: { y: number, display: number, },
     },
     y: {
       y: number,
       length: number,
-      left: { x: number, display: string, },
-      right: { x: number, display: string, },
+      left: { x: number, display: number, },
+      right: { x: number, display: number, },
     },
   },
   ball: {
@@ -67,14 +67,14 @@ state = {
         x: {
           x: 0,
           length: 0,
-          top: { y: 0, display: 'none', },
-          bottom: { y: 0, display: 'none', },
+          top: { y: 0, display: 0, },
+          bottom: { y: 0, display: 0, },
         },
         y: {
           y: 0,
           length: 0,
-          left: { x: 0, display: 'none', },
-          right: { x: 0, display: 'none', },
+          left: { x: 0, display: 0, },
+          right: { x: 0, display: 0, },
         },
       },
       ball: {
@@ -157,12 +157,12 @@ state = {
 
     let on = update(this.state.paddles, {
       x: {
-        top: {display: {$set: keys[0] ? 'on' : 'none'},},
-        bottom: {display: {$set: keys[1] ? 'on' : 'none'},},
+        top: {display: {$set: keys[0] ? 1 : 0},},
+        bottom: {display: {$set: keys[1] ? 1 : 0},},
       },
       y: {
-        left: {display: {$set: keys[2] ? 'on' : 'none'},},
-        right: {display: {$set: keys[3] ? 'on' : 'none'},},
+        left: {display: {$set: keys[2] ? 1 : 0},},
+        right: {display: {$set: keys[3] ? 1 : 0},},
       },
     })
     this.setState({paddles: on})
@@ -195,8 +195,8 @@ state = {
           || ball.y + ball.r + ball.dy > cell.y + cell.h ) {
       dy *= -1
     // if ball hits x paddle. paddle must be present.
-  } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display !== 'none' )
-    || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display !== 'none' )) {
+  } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display > 0 )
+    || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display > 0 )) {
     if (pad.x.x <= ball.x + ball.r + dx && ball.x - ball.r + dx <= pad.x.x + pad.x.length) {
       dy *= -1
       score += 1
@@ -208,8 +208,8 @@ state = {
       this.props.score(score)
     }
     // if ball hits y paddle. paddle must be present.
-  } else if (( ball.x - ball.r + dx <= cell.x + pad.depth && pad.y.left.display !== 'none' )
-    || ( ball.x + ball.r + dx >= cell.x + cell.w - pad.depth && pad.y.right.display !== 'none' )) {
+  } else if (( ball.x - ball.r + dx <= cell.x + pad.depth && pad.y.left.display > 0 )
+    || ( ball.x + ball.r + dx >= cell.x + cell.w - pad.depth && pad.y.right.display > 0 )) {
     if (pad.y.y <= ball.y + ball.r + dx && ball.y - ball.r + dy <= pad.y.y + pad.y.length) {
       dx *= -1
       score += 1
@@ -287,22 +287,22 @@ state = {
         <Circle
           cx={ s.ball.x } cy={ s.ball.y }
           r={ s.ball.r } fill={ this.props.fill } />
-        <Rect id='paddleXT' display={ pad.x.top.display }
+        <Rect id='paddleXT'
           width={ pad.x.length } height={ pad.depth }
           x={ pad.x.x } y={ pad.x.top.y }
-          fill={ this.props.fill } />
-        <Rect id='paddleXB' display={ pad.x.bottom.display }
+          fill={ this.props.fill } fillOpacity={ pad.x.top.display }/>
+        <Rect id='paddleXB'
           width={ pad.x.length } height={ pad.depth }
           x={ pad.x.x } y={ pad.x.bottom.y }
-          fill={ this.props.fill } />
-        <Rect id='paddleYL' display={pad.y.left.display}
+          fill={ this.props.fill } fillOpacity={ pad.x.bottom.display }/>
+        <Rect id='paddleYL'
           width={ pad.depth } height={ pad.y.length }
           x={ pad.y.left.x } y={ pad.y.y }
-          fill={ this.props.fill } />
-        <Rect id='paddleYR' display={pad.y.right.display}
+          fill={ this.props.fill } fillOpacity={pad.y.left.display}/>
+        <Rect id='paddleYR'
           width={ pad.depth } height={ pad.y.length }
           x={ pad.y.right.x } y={ pad.y.y }
-          fill={ this.props.fill } />
+          fill={ this.props.fill } fillOpacity={pad.y.right.display}/>
       </Svg>
     )
   }

@@ -23,10 +23,25 @@ export default class App extends Component<{},{score: any}> {
   render() {
     let s = this.state
     return (
-      <View style={styles.container}>
+      <View style={styles.full, styles.container}>
         <Game fill='#eeeeee' score={this.getScore} />
+        <Input />
         <Score score={this.state.score} />
       </View>
+    )
+  }
+}
+
+class Input extends Component<{},{}> {
+  state = {}
+
+    /// THIS WILL COLLECT DATA FROM INPUTS AND SEND IT TO THE App
+    /// THE APP WILL THEN SEND THIS DATA TO THE GAME Component
+    /// THE GAME COMPONENT WILL UPDATE THE POSITION OF THE PADDLES
+
+  render() {
+    return (
+      <View style={styles.full} />
     )
   }
 }
@@ -37,7 +52,6 @@ function Score(props: {score: any}) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
@@ -48,5 +62,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     zIndex: 3,
     position: 'absolute',
+  },
+  full: {
+    flex: 1,
   },
 });
