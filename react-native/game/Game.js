@@ -1,45 +1,111 @@
-import React, { Component } from 'react'
-import update from 'immutability-helper'
+/*@format @flow*/
 
-export default class Game extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      svg: {},
-      cell: {},
+import React, { Component } from 'react';
+import { StyleSheet, Dimensions } from 'react-native';
+import Svg, { Circle, Rect } from 'react-native-svg';
+import update from 'immutability-helper';
+
+type Props = {
+  score: any,
+  fill: string,
+}
+
+type State = {
+  svg: {
+    w: number,
+    h: number,
+    box: string,
+    size: number,
+    },
+  cell: {
+    x: number,
+    y: number,
+    h: number,
+    w: number,
+    },
+  paddles: {
+    depth: number,
+    x: {
+      x: number,
+      length: number,
+      top: { y: number, display: number, },
+      bottom: { y: number, display: number, },
+    },
+    y: {
+      y: number,
+      length: number,
+      left: { x: number, display: number, },
+      right: { x: number, display: number, },
+    },
+  },
+  ball: {
+    x: number,
+    y: number,
+    r: number,
+    dx: number,
+    dy: number,
+    },
+  score: any,
+}
+
+export default class Game extends Component<Props, State> {
+state = {
+      svg: {
+        w: 0,
+        h: 0,
+        box: '0 0 0 0',
+        size:0,
+        },
+      cell: {
+        x: 0,
+        y: 0,
+        h: 0,
+        w: 0,
+        },
       paddles: {
+        depth: 0,
         x: {
-          top: { display: 0 },
-          bottom: { display: 0 },
+          x: 0,
+          length: 0,
+          top: { y: 0, display: 0, },
+          bottom: { y: 0, display: 0, },
         },
         y: {
-          left: { display: 0 },
-          right: { display: 0 },
+          y: 0,
+          length: 0,
+          left: { x: 0, display: 0, },
+          right: { x: 0, display: 0, },
         },
       },
-      ball: {},
+      ball: {
+        x: 0,
+        y: 0,
+        r: 0,
+        dx: 0,
+        dy: 0,
+        },
+      score: 0,
     }
-  }
 
   setSvg = () => {
-    let w = window.innerWidth, h = window.innerHeight
+    const { width, height } = Dimensions.get('window')
     let svg = update(this.state.svg, {
-      w: {$set: w},
-      h: {$set: h},
-      box: {$set: [0, 0, w, h].join(' ')},
-      size: {$set: Math.sqrt( w*w + h*h )}
+      w: {$set: width},
+      h: {$set: height},
+      box: {$set: [0, 0, width, height].join(' ')},
+      size: {$set: Math.sqrt( width*width + height*height )}
     })
     this.setState({ svg: svg })
   }
 
   setCell = () => {
-    let w = this.state.svg.w * .8, h = this.state.svg.h * .8
-    let cell = update(this.state.cell, {
-      w: {$set: w},
-      h: {$set: h},
-      x: {$set: (this.state.svg.w - w) / 2},
-      y: {$set: (this.state.svg.h - h) / 2},
-    })
+    let w = this.state.svg.w * .8, h = this.state.svg.h * .8,
+      cell = update(this.state.cell, {
+        w: {$set: w},
+        h: {$set: h},
+        x: {$set: (this.state.svg.w - w) / 2},
+        y: {$set: (this.state.svg.h - h) / 2},
+      })
     this.setState({cell: cell})
   }
 
@@ -91,12 +157,12 @@ export default class Game extends Component {
 
     let on = update(this.state.paddles, {
       x: {
-        top: {display: {$set: keys[0] ? 1 : 0 },},
-        bottom: {display: {$set: keys[1] ? 1 : 0 },},
+        top: {display: {$set: keys[0] ? 1 : 0},},
+        bottom: {display: {$set: keys[1] ? 1 : 0},},
       },
       y: {
-        left: {display: {$set: keys[2] ? 1 : 0 },},
-        right: {display: {$set: keys[3] ? 1 : 0 },},
+        left: {display: {$set: keys[2] ? 1 : 0},},
+        right: {display: {$set: keys[3] ? 1 : 0},},
       },
     })
     this.setState({paddles: on})
@@ -169,25 +235,6 @@ export default class Game extends Component {
     this.setState({ ball: move, score: score })
   }
 
-  movePaddles = () => {
-    //takes position data from <Input /> and uses it to update paddle position
-    let cell = this.state.cell, pad = this.state.paddles,
-      halfX = pad.x.length / 2, halfY = pad.y.length / 2,
-      rightBound = cell.x + cell.w - halfX,
-      lowerBound = cell.y + cell.h - halfY,
-      x = this.props.x, y = this.props.y; //[x,y]=input position
-
-    x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
-    y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
-
-    let move = update(pad, {
-      x: {x: {$set: x }},
-      y: {y: {$set: y }},
-    })
-
-    this.setState({ paddles: move })
-  }
-
   setGame = () => {
     this.props.score('hit the ball')
     this.setState({score: 0})
@@ -201,74 +248,68 @@ export default class Game extends Component {
     setTimeout(this.setPaddles, 1)
   }
 
-  animate = () => {
-    this.movePaddles()
-    this.moveBall()
-  }
-
   componentDidMount() {
     this.setGame()
-    window.addEventListener('resize', this.sizeGame)
-    window.setInterval(this.animate, 10)
+    //window.addEventListener('resize', this.sizeGame)
+    //window.addEventListener('mousemove', this.movePaddles)
+    //window.addEventListener('touchmove', this.movePaddles)
+    window.setInterval(this.moveBall, 10)
   }
 
-  shouldComponentUpdate(nextProps, nextState){
+  shouldComponentUpdate(nextProps: Props, nextState: State){
     return this.state !== nextState
   }
 
   componentDidUpdate() {
-    if (this.props.stage === 1
-    || (this.props.stage === 2 && this.state.score === ':(')) {
+    if (this.state.score === ':(') {
       this.pickPaddles()
-      this.props.nextStage()
-    } else if (this.props.stage === 4) {
-      this.props.nextStage(0)
-      this.setGame()
-    } else if (this.props.sh === true) {
-      this.pickPaddles()
-      this.props.shuffle()
+      this.setState({score: 'x'})
     }
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.sizeGame)
-    window.clearInterval(window.setInterval(this.animate, 10))
+    //window.removeEventListener('resize', this.sizeGame)
+    //window.removeEventListener('mousemove', this.movePaddles)
+    //window.removeEventListener('touchmove', this.movePaddles)
+    window.clearInterval(window.setInterval(this.moveBall, 10))
   }
 
   render() {
-    let s = this.state
-    let pad = this.state.paddles
-    return(
-      <svg
+    let s = this.state, pad = this.state.paddles
+    return (
+      <Svg
+        style={styles.svg}
         width={ s.svg.w } height={ s.svg.h }
-        viewBox={ s.svg.box } onClick={ this.handleClick }>
-
-        <rect id='cell'
+        viewBox={ s.svg.box }>
+        <Rect
           width={ s.cell.w } height={ s.cell.h }
-          x={ s.cell.x } y={ s.cell.y } />
-
-        <circle id='ball'
+          x={ s.cell.x } y={ s.cell.y }/>
+        <Circle
           cx={ s.ball.x } cy={ s.ball.y }
           r={ s.ball.r } fill={ this.props.fill } />
-
-        <rect id='paddleXT'
+        <Rect id='paddleXT'
           width={ pad.x.length } height={ pad.depth }
           x={ pad.x.x } y={ pad.x.top.y }
-          fill={ this.props.fill } fillOpacity={ pad.x.top.display } />
-        <rect id='paddleXB'
+          fill={ this.props.fill } fillOpacity={ pad.x.top.display }/>
+        <Rect id='paddleXB'
           width={ pad.x.length } height={ pad.depth }
           x={ pad.x.x } y={ pad.x.bottom.y }
-          fill={ this.props.fill } fillOpacity={ pad.x.bottom.display } />
-        <rect id='paddleYL'
+          fill={ this.props.fill } fillOpacity={ pad.x.bottom.display }/>
+        <Rect id='paddleYL'
           width={ pad.depth } height={ pad.y.length }
           x={ pad.y.left.x } y={ pad.y.y }
-          fill={ this.props.fill } fillOpacity={pad.y.left.display} />
-        <rect id='paddleYR'
+          fill={ this.props.fill } fillOpacity={pad.y.left.display}/>
+        <Rect id='paddleYR'
           width={ pad.depth } height={ pad.y.length }
           x={ pad.y.right.x } y={ pad.y.y }
-          fill={ this.props.fill } fillOpacity={pad.y.right.display} />
-
-      </svg>
+          fill={ this.props.fill } fillOpacity={pad.y.right.display}/>
+      </Svg>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  svg: {
+    backgroundColor: '#00ff00',
+  },
+});

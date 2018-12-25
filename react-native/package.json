@@ -7,13 +7,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "babel-core": "^6.26.3",
     "immutability-helper": "^2.8.1",
-    "react": "16.6.1",
+    "react": "^16.6.3",
+    "react-art": "^16.6.3",
+    "react-dom": "^16.6.3",
     "react-native": "0.57.6",
     "react-native-hooks": "0.0.6",
-    "react-native-svg": "^8.0.8"
+    "react-native-svg": "^8.0.8",
+    "react-native-web": "^0.9.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.0",
     "babel-cli": "^6.26.0",
     "babel-jest": "23.6.0",
     "babel-preset-flow": "^6.23.0",
