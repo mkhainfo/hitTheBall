@@ -6,25 +6,41 @@ import './App.css'
 export default class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      stage: 0,
+      shuffle: false,
+    }
   }
 
-getScore = (n) => {
-  this.setState({ score : n })
+getScore = score => {
+  this.setState({ score })
 }
 
-getPosition = (x, y) => {
-  this.setState({x, y})
+getPosition = ( x, y ) => {
+  this.setState({ x, y })
 }
 
-pushNext = () => {}
+nextStage = stage => {
+  if (stage === undefined) { stage = this.state.stage + 1 }
+  this.setState({ stage })
+}
+
+shuffle = () => {
+  let shuffle = this.state.shuffle ? false : true
+  this.setState({shuffle})
+}
 
   render() {
     return (
       <span id='view'>
-        <Input pos={this.getPosition} score={this.state.score} />
-        <Game fill='#eeeeee' score={this.getScore}
-          x={this.state.x} y={this.state.y} />
+        <Input pos={this.getPosition}
+          score={this.state.score} shuffle={this.shuffle}
+          stage={this.state.stage} nextStage={this.nextStage}/>
+        <Game fill='#eeeeee'
+          score={this.getScore}
+          stage={this.state.stage} nextStage={this.nextStage}
+          x={this.state.x} y={this.state.y}
+          shuffle={this.shuffle} sh={this.state.shuffle}/>
         <Score score={this.state.score} />
       </span>
     )
@@ -45,19 +61,17 @@ class Input extends Component {
     return false
   }
 
-  handleClick = () => {
-    if (this.props.score === 'hit the ball') {
-      ////start the game
-    } else if (this.props.score === ':(') {
-      ///// reset the game
-    }
+  handleClick = e => {
+    if (this.props.stage === 0 || this.props.stage === 3){
+      this.props.nextStage()
+    } else {this.props.shuffle()}
     //this.state.score === 'x' ? this.setGame() : this.pickPaddles()
     return false
   }
 
   render() {
     return (
-      <span style={styles.input}
+      <span style={styles.input} onClick={this.handleClick}
         onMouseMove={this.changePos} onTouchMove={this.changePos} />
     )
   }
@@ -93,7 +107,7 @@ const styles = {
     height: '100%',
     position: 'absolute',
     backgroundColor: 'cyan',
-    opacity: 0.3,
+    opacity: 0,
     zIndex: 5,
   },
 }

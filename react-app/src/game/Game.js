@@ -10,7 +10,7 @@ export default class Game extends Component {
       paddles: {
         x: {
           top: { display: 0 },
-          bottom: { display: 1 },
+          bottom: { display: 0 },
         },
         y: {
           left: { display: 0 },
@@ -217,10 +217,17 @@ export default class Game extends Component {
   }
 
   componentDidUpdate() {
-    /*if (this.state.score === ':(') {
+    if (this.props.stage === 1
+    || (this.props.stage === 2 && this.state.score === ':(')) {
       this.pickPaddles()
-      this.setState({score: 'x'})
-    }*/
+      this.props.nextStage()
+    } else if (this.props.stage === 4) {
+      this.props.nextStage(0)
+      this.setGame()
+    } else if (this.props.sh === true) {
+      this.pickPaddles()
+      this.props.shuffle()
+    }
   }
 
   componentWillUnmount() {
@@ -234,8 +241,8 @@ export default class Game extends Component {
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
-        viewBox={ s.svg.box } onClick={ this.handleClick }
-         >
+        viewBox={ s.svg.box } onClick={ this.handleClick }>
+
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
           x={ s.cell.x } y={ s.cell.y } />
