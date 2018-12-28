@@ -58,7 +58,7 @@ export default class Game extends Component {
 
   checkRange = ( size ) => {
     size /= 10
-    let svg = this.state.svg, cell = this.state.cell, ball = this.state.ball,
+    let cell = this.state.cell, ball = this.state.ball,
         w = cell.w * size, h = cell.h * size
 
         return (ball.x > cell.x + ball.r && ball.x < cell.x + w - ball.r)
