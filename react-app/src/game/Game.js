@@ -36,7 +36,7 @@ export default class Game extends Component {
 
     if (size === undefined) {
       if (this.state.score < 2) {
-        size = 10
+        size = 9.5
       } else if (this.state.score < 5) {
         size = 9
       } else if (this.state.score < 6) {
@@ -129,6 +129,10 @@ export default class Game extends Component {
       } else { keys = this.makeKey(3, 4)}
     }
 
+    //////FOR TESTING
+    //keys = [1,1,1,1]
+    //////FOR TESTING
+
     let on = update(this.state.paddles, {
       x: {
         top: {display: {$set: keys[0] },},
@@ -163,19 +167,27 @@ export default class Game extends Component {
 
   moveBall = () => {
 
-    let cell = this.state.cell, ball = this.state.ball, bounce = ball,
-        pad = this.state.paddles, dx = ball.dx, dy = ball.dy, score = this.state.score
+    let svg = this.state.svg, cell = this.state.cell, ball = this.state.ball,
+      pad = this.state.paddles, xMid = svg.w / 2, yMid = svg.h / 2,
+      dx = ball.dx, dy = ball.dy, xPos = ball.x, yPos = ball.y,
+      score = this.state.score
 
     // if the ball hits a vertical wall
-    if ( ball.x + dx - ball.r < cell.x
+     if ( ball.x + ball.dx < 0 || ball.x + ball.dx > svg.w ) {
+      xPos = ball.x < 0 ? svg.w : 0
+      yPos = ball.y + (yMid - ball.y) * 2
+    } else if ( ball.y + ball.dy < 0 || ball.y + ball.dy > svg.h ) {
+      xPos = ball.x + (xMid - ball.x) * 2
+      yPos = ball.y < 0 ? svg.h : 0
+    } else if ( ball.x + dx - ball.r < cell.x
           || ball.x + ball.dx + ball.r > cell.x + cell.w) {
       dx *= -1
     // if ball hits horizontal wall
-  } else if (ball.y + dy - ball.r  < cell.y
+    } else if (ball.y + dy - ball.r  < cell.y
           || ball.y + ball.r + ball.dy > cell.y + cell.h ) {
       dy *= -1
     // if ball hits x paddle. paddle must be present.
-  } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display > 0 )
+    } else if (( ball.y - ball.r + dy <= cell.y + pad.depth && pad.x.top.display > 0 )
     || ( ball.y + ball.r + dy >= cell.y + cell.h - pad.depth && pad.x.bottom.display > 0 )) {
     if (pad.x.x <= ball.x + ball.r + dx && ball.x - ball.r + dx <= pad.x.x + pad.x.length) {
       dy *= -1
@@ -202,26 +214,26 @@ export default class Game extends Component {
     }
   }
 
-    bounce = update(ball, {
+    let bounce = update(ball, {
       dx: {$set: dx},
       dy: {$set: dy},
       })
 
     let move = update(bounce, {
-      x: {$set: ball.x + ball.dx},
-      y: {$set: ball.y + ball.dy},
+      x: {$set: xPos + ball.dx},
+      y: {$set: yPos + ball.dy},
       })
 
-    this.setState({ ball: move, score: score })
+    this.setState({ ball: move, score })
   }
 
   movePaddles = () => {
-  //takes position data from <Input /> and uses it to update paddle position
     let cell = this.state.cell, pad = this.state.paddles,
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
       lowerBound = cell.y + cell.h - halfY,
-      x = this.props.x, y = this.props.y
+      //x = this.props.x, y = this.props.y // manual <Input />
+      x = this.state.ball.x, y = this.state.ball.y // automated paddles
 
     x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
     y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
@@ -267,18 +279,22 @@ export default class Game extends Component {
     if (this.props.stage === 1) {
       this.pickPaddles()
       this.props.nextStage()
-    } else if (this.props.stage === 2 && this.state.score === ':(') {
-      this.pickPaddles([0,0,0,0])
+    } else if ( this.props.stage === 2
+      && ( this.state.score === ':(' || this.state.score === ':)' )) {
+      if (this.state.score === ':(') { this.pickPaddles([0,0,0,0]) }
       this.props.nextStage()
     } else if (this.props.stage === 4) {
+      if (this.state.score === ':)') { this.pickPaddles([0,0,0,0]) }
       this.props.nextStage(0)
       this.setGame()
     } else if (this.props.shuffling === true) {
       this.pickPaddles()
       this.props.shuffle()
-    } else if ( this.state.score >= 3 && this.state.cell.size === 1 && this.checkRange(7) ) {
-      this.setCell(9)
-      this.adjustPaddles(9)
+    } else if ( this.state.score >= 1 && this.state.cell.size === 0.95 && this.checkRange(6) ) {
+      this.setCell(1.5)
+      this.adjustPaddles(1.5)
+      this.props.score(':)')
+      this.setState({score: ':)'})
     }
   }
 

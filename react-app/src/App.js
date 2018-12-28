@@ -34,7 +34,8 @@ shuffle = () => {
 componentDidUpdate() {
   if (this.state.stage === 1 && this.state.cursor.cursor === 'default') {
     this.setState({cursor: {cursor: 'none'}})
-  } else if (this.state.score === ':(' && this.state.cursor.cursor === 'none') {
+  } else if ( (this.state.score === ':(' || this.state.score === ':)')
+    && this.state.cursor.cursor === 'none' ) {
     this.setState({cursor: {cursor: 'default'}})
   }
 }

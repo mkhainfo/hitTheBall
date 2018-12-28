@@ -221,7 +221,8 @@ export default class Game extends Component {
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
       lowerBound = cell.y + cell.h - halfY,
-      x = this.props.x, y = this.props.y
+      x = this.props.x, y = this.props.y // manual <Input />
+      //x = this.state.ball.x, y = this.state.ball.y // automated paddles
 
     x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
     y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
