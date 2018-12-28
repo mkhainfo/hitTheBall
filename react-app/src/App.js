@@ -9,6 +9,7 @@ export default class App extends Component {
     this.state = {
       stage: 0,
       shuffle: false,
+      cursor: {cursor: 'default'},
     }
   }
 
@@ -30,9 +31,17 @@ shuffle = () => {
   this.setState({shuffle})
 }
 
+componentDidUpdate() {
+  if (this.state.stage === 1 && this.state.cursor.cursor === 'default') {
+    this.setState({cursor: {cursor: 'none'}})
+  } else if (this.state.score === ':(' && this.state.cursor.cursor === 'none') {
+    this.setState({cursor: {cursor: 'default'}})
+  }
+}
+
   render() {
     return (
-      <span id='view'>
+      <span id='view' style={this.state.cursor}>
         <Input pos={this.getPosition}
           score={this.state.score} shuffle={this.shuffle}
           stage={this.state.stage} nextStage={this.nextStage}/>
@@ -65,7 +74,6 @@ class Input extends Component {
     if (this.props.stage === 0 || this.props.stage === 3){
       this.props.nextStage()
     } else {this.props.shuffle()}
-    //this.state.score === 'x' ? this.setGame() : this.pickPaddles()
     return false
   }
 
@@ -110,4 +118,5 @@ const styles = {
     opacity: 0,
     zIndex: 5,
   },
+
 }
