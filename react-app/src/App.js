@@ -40,7 +40,7 @@ shuffle = () => {
           score={this.getScore}
           stage={this.state.stage} nextStage={this.nextStage}
           x={this.state.x} y={this.state.y}
-          shuffle={this.shuffle} sh={this.state.shuffle}/>
+          shuffle={this.shuffle} shuffling={this.state.shuffle}/>
         <Score score={this.state.score} />
       </span>
     )
