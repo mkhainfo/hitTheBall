@@ -212,7 +212,7 @@ export default class Game extends Component {
       y: {$set: ball.y + ball.dy},
       })
 
-    this.setState({ ball: move, score: score })
+    this.setState({ ball: move, score })
   }
 
   movePaddles = () => {
@@ -289,12 +289,11 @@ export default class Game extends Component {
   }
 
   render() {
-    let s = this.state
-    let pad = this.state.paddles
+    let s = this.state, pad = this.state.paddles
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
-        viewBox={ s.svg.box } onClick={ this.handleClick }>
+        viewBox={ s.svg.box } >
 
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }

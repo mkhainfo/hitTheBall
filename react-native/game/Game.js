@@ -6,8 +6,14 @@ import Svg, { Circle, Rect } from 'react-native-svg';
 import update from 'immutability-helper';
 
 type Props = {
-  score: any,
+  score: (score: any) => void,
   fill: string,
+  stage: number,
+  nextStage: (stage?: number) => void,
+  x: number,
+  y: number,
+  shuffle: void => void,
+  shuffling: boolean,
 }
 
 type State = {
@@ -68,7 +74,7 @@ state = {
           x: 0,
           length: 0,
           top: { y: 0, display: 0, },
-          bottom: { y: 0, display: 0, },
+          bottom: { y: 0, display: 1, },
         },
         y: {
           y: 0,
@@ -128,57 +134,62 @@ state = {
     this.setState({paddles: ready})
   }
 
-  pickPaddles = () => {
-    const printArr = (min, max) => {
-      max = max === undefined ? min : max
-      let arr = []
-      for (let i = 0; i < 4; i++) {
-        arr.push(Math.round(Math.random()))
-      }
-      let arrSum = arr.reduce( (a, b) => a + b )
-      return min <= arrSum && arrSum <= max ? arr : printArr(min, max)
+  makeKey = (min: number, max?: number) => {
+    max = max === undefined ? min : max
+    let arr = []
+    for (let i = 0; i < 4; i++) {
+      arr.push(Math.round(Math.random()))
     }
+    let arrSum = arr.reduce( (a, b) => a + b )
+    return min <= arrSum && arrSum <= max ? arr : this.makeKey(min, max)
+  }
 
-    // keys sets up "level" conditions based on score
-    let keys
-    if (this.state.score === ':(') {
-      keys = [0,0,0,0]
-    } else if (this.state.score < 2) {
-      keys = [0,1,0,0]
-    } else if (this.state.score < 5) {
-      keys = printArr(1)
-    } else if (this.state.score < 6) {
-      keys = printArr(2)
-    } else if (this.state.score < 7) {
-      keys = printArr(1, 2)
-    } else if (this.state.score < 15) {
-      keys = printArr(2, 3)
-    } else { keys = printArr(3, 4)}
+  pickPaddles = (keys?: number[]) => {
+  //type keys = [num, num, num, num]
+    if (keys === undefined) {
+      if (this.state.score < 1) {
+        keys = [0,1,0,0]
+      } else if (this.state.score < 5) {
+        keys = this.makeKey(1)
+      } else if (this.state.score < 6) {
+        keys = this.makeKey(2)
+      } else if (this.state.score < 7) {
+        keys = this.makeKey(1, 2)
+      } else if (this.state.score < 15) {
+        keys = this.makeKey(2, 3)
+      } else { keys = this.makeKey(3, 4)}
+    }
 
     let on = update(this.state.paddles, {
       x: {
-        top: {display: {$set: keys[0] ? 1 : 0},},
-        bottom: {display: {$set: keys[1] ? 1 : 0},},
+        top: {display: {$set: keys[0] },},
+        bottom: {display: {$set: keys[1] },},
       },
       y: {
-        left: {display: {$set: keys[2] ? 1 : 0},},
-        right: {display: {$set: keys[3] ? 1 : 0},},
+        left: {display: {$set: keys[2] },},
+        right: {display: {$set: keys[3] },},
       },
     })
     this.setState({paddles: on})
   }
 
   setBall = () => {
-    let svg = this.state.svg
-    let ball = update(this.state.ball, {
+    let svg = this.state.svg,
+    ball = update(this.state.ball, {
       x: {$set: svg.w/2},
       y: {$set: svg.h/2},
       r: {$set: svg.size/100},
+      })
+    this.setState({ ball })
+  }
+
+  setInitialVelocity = () => {
+    let svg = this.state.svg,
+    ball = update(this.state.ball, {
       dx: {$set: svg.size/500},
       dy: {$set: svg.size/500},
       })
-
-    this.setState({ ball: ball })
+    this.setState({ ball })
   }
 
   moveBall = () => {
@@ -232,13 +243,34 @@ state = {
       y: {$set: ball.y + ball.dy},
       })
 
-    this.setState({ ball: move, score: score })
+    this.setState({ ball: move, score })
+  }
+
+  movePaddles = () => {
+  //takes position data from <Input /> and uses it to update paddle position
+    let cell = this.state.cell, pad = this.state.paddles,
+      halfX = pad.x.length / 2, halfY = pad.y.length / 2,
+      rightBound = cell.x + cell.w - halfX,
+      lowerBound = cell.y + cell.h - halfY,
+      //x = this.props.x, y = this.props.y // manual <Input />
+      x = this.state.ball.x, y = this.state.ball.y // automated paddles
+
+    x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
+    y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
+
+    let move = update(pad, {
+      x: {x: {$set: x }},
+      y: {y: {$set: y }},
+    })
+
+    this.setState({ paddles: move })
   }
 
   setGame = () => {
     this.props.score('hit the ball')
     this.setState({score: 0})
     this.sizeGame()
+    setTimeout(this.setInitialVelocity, 1)
   }
 
   sizeGame = () => {
@@ -248,12 +280,15 @@ state = {
     setTimeout(this.setPaddles, 1)
   }
 
+  animate = () => {
+    this.movePaddles()
+    this.moveBall()
+  }
+
   componentDidMount() {
     this.setGame()
-    //window.addEventListener('resize', this.sizeGame)
-    //window.addEventListener('mousemove', this.movePaddles)
-    //window.addEventListener('touchmove', this.movePaddles)
-    window.setInterval(this.moveBall, 10)
+    //window.addEventListener('resize', this.sizeGame) //replace with rotate
+    window.setInterval(this.animate, 10)
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State){
@@ -261,17 +296,24 @@ state = {
   }
 
   componentDidUpdate() {
-    if (this.state.score === ':(') {
+    if (this.props.stage === 1) {
       this.pickPaddles()
-      this.setState({score: 'x'})
+      this.props.nextStage()
+    } else if (this.props.stage === 2 && this.state.score === ':(') {
+      this.pickPaddles([0,0,0,0])
+      this.props.nextStage()
+    } else if (this.props.stage === 4) {
+      this.props.nextStage(0)
+      this.setGame()
+    } else if (this.props.shuffling === true) {
+      this.pickPaddles()
+      this.props.shuffle()
     }
   }
 
   componentWillUnmount() {
-    //window.removeEventListener('resize', this.sizeGame)
-    //window.removeEventListener('mousemove', this.movePaddles)
-    //window.removeEventListener('touchmove', this.movePaddles)
-    window.clearInterval(window.setInterval(this.moveBall, 10))
+    //window.removeEventListener('resize', this.sizeGame) //replace with rotate
+    window.clearInterval(window.setInterval(this.animate, 10))
   }
 
   render() {
@@ -281,12 +323,15 @@ state = {
         style={styles.svg}
         width={ s.svg.w } height={ s.svg.h }
         viewBox={ s.svg.box }>
+
         <Rect
           width={ s.cell.w } height={ s.cell.h }
           x={ s.cell.x } y={ s.cell.y }/>
+
         <Circle
           cx={ s.ball.x } cy={ s.ball.y }
           r={ s.ball.r } fill={ this.props.fill } />
+
         <Rect id='paddleXT'
           width={ pad.x.length } height={ pad.depth }
           x={ pad.x.x } y={ pad.x.top.y }
@@ -310,6 +355,6 @@ state = {
 
 const styles = StyleSheet.create({
   svg: {
-    backgroundColor: '#00ff00',
+    backgroundColor: 'white',
   },
 });

@@ -11,21 +11,50 @@ import Game from './game/Game.js';
     'Shake or press menu button for dev menu',
 });*/
 
-export default class App extends Component<{},{score: any}> {
+type AppState = {
+  score: any,
+  stage: number,
+  x: number,
+  y: number,
+  shuffle: boolean,
+}
+
+export default class App extends Component<{}, AppState> {
   state = {
     score: 'hit the ball',
+    stage: 0,
+    x: 0,
+    y: 0,
+    shuffle: false,
   }
 
-  getScore = (n: any) => {
-    this.setState({ score : n })
+  getScore = (score: any) => {
+    this.setState({ score })
+  }
+
+  getPosition = ( x: number, y: number ) => {
+    this.setState({ x, y })
+  }
+
+  nextStage = (stage?: number) => {
+    if (stage === undefined) { stage = this.state.stage + 1 }
+    this.setState({ stage })
+  }
+
+  shuffle = () => {
+    let shuffle = this.state.shuffle ? false : true
+    this.setState({ shuffle })
   }
 
   render() {
-    let s = this.state
     return (
       <View style={styles.full, styles.container}>
-        <Game fill='#eeeeee' score={this.getScore} />
         <Input />
+        <Game fill='#eeeeee'
+          score={this.getScore}
+          stage={this.state.stage} nextStage={this.nextStage}
+          x={this.state.x} y={this.state.y}
+          shuffle={this.shuffle} shuffling={this.state.shuffle} />
         <Score score={this.state.score} />
       </View>
     )
