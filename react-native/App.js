@@ -1,7 +1,7 @@
 /*@format @flow*/
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, Dimensions } from 'react-native';
 import Game from './game/Game.js';
 
 /*const instructions = Platform.select({
@@ -10,6 +10,15 @@ import Game from './game/Game.js';
     'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu',
 });*/
+
+/*install notes
+  warning " > react-native@0.57.6" has incorrect peer dependency "react@16.6.1".
+
+*/
+const getSize = x => {
+  const { width, height } = Dimensions.get('window')
+  return x === 'w' ? width : height
+}
 
 type AppState = {
   score: any,
@@ -48,8 +57,9 @@ export default class App extends Component<{}, AppState> {
 
   render() {
     return (
-      <View style={styles.full, styles.container}>
-        <Input />
+      <View style={styles.container}>
+        <Input stage={this.state.stage} nextStage={this.nextStage}
+          pos={this.getPosition} shuffle={this.shuffle} />
         <Game fill='#eeeeee'
           score={this.getScore}
           stage={this.state.stage} nextStage={this.nextStage}
@@ -61,16 +71,42 @@ export default class App extends Component<{}, AppState> {
   }
 }
 
-class Input extends Component<{},{}> {
-  state = {}
+type inputProps = {
+  stage: number,
+  nextStage: (stage?: number) => void,
+  pos: (x: number, y: number) => void,
+  shuffle: void => void,
+}
 
+class Input extends Component< inputProps,{txt: string}> {
+  state = {
+    txt: 'no'
+  }
+
+  onStartShouldSetResponder = e => true
+
+  changePos = e => {
+    let x = e.nativeEvent.pageX,
+        y = e.nativeEvent.pageY
+    this.props.pos(x, y)
+  }
+
+  shuffle = e => {
+    if (this.props.stage === 0 || this.props.stage === 3){
+      this.props.nextStage()
+    } else {this.props.shuffle()}
+    }
     /// THIS WILL COLLECT DATA FROM INPUTS AND SEND IT TO THE App
     /// THE APP WILL THEN SEND THIS DATA TO THE GAME Component
     /// THE GAME COMPONENT WILL UPDATE THE POSITION OF THE PADDLES
-
+    /// onLayout={}
   render() {
     return (
-      <View style={styles.full} />
+      <View style={styles.input}
+        onStartShouldSetResponder={this.onStartShouldSetResponder}
+        onResponderMove={this.changePos}
+        onResponderRelease={this.shuffle}
+         />
     )
   }
 }
@@ -79,6 +115,8 @@ function Score(props: {score: any}) {
     return <Text style={styles.score}>{props.score}</Text>
 }
 
+
+
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
@@ -86,13 +124,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   score: {
-  //  fontSize: '6vh',
+    fontSize: getSize('h')/30,
     color: '#eee',
     textAlign: 'center',
     zIndex: 3,
     position: 'absolute',
   },
-  full: {
-    flex: 1,
+  input: {
+    backgroundColor: 'cyan',
+    zIndex: 5,
+    position: 'absolute',
+    width: getSize('w'),
+    height: getSize('h'),
+    opacity: 0,
   },
 });

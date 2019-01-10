@@ -1,4 +1,4 @@
-/*@format @flow*/
+/* @format @flow */
 
 import React, { Component } from 'react';
 import { StyleSheet, Dimensions } from 'react-native';
@@ -74,7 +74,7 @@ state = {
           x: 0,
           length: 0,
           top: { y: 0, display: 0, },
-          bottom: { y: 0, display: 1, },
+          bottom: { y: 0, display: 0, },
         },
         y: {
           y: 0,
@@ -252,8 +252,8 @@ state = {
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
       lowerBound = cell.y + cell.h - halfY,
-      //x = this.props.x, y = this.props.y // manual <Input />
-      x = this.state.ball.x, y = this.state.ball.y // automated paddles
+      x = this.props.x, y = this.props.y // manual <Input />
+      //x = this.state.ball.x, y = this.state.ball.y // automated paddles
 
     x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
     y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
