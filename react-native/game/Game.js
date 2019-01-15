@@ -6,8 +6,10 @@ import Svg, { Circle, Rect } from 'react-native-svg';
 import update from 'immutability-helper';
 
 type Props = {
-  score: (score: any) => void,
   fill: string,
+  w: number,
+  h: number,
+  score: (score: any) => void,
   stage: number,
   nextStage: (stage?: number) => void,
   x: number,
@@ -94,7 +96,8 @@ state = {
     }
 
   setSvg = () => {
-    const { width, height } = Dimensions.get('window')
+    let width = this.props.w, height = this.props.h
+    //const { width, height } = Dimensions.get('window')
     let svg = update(this.state.svg, {
       w: {$set: width},
       h: {$set: height},
@@ -247,7 +250,6 @@ state = {
   }
 
   movePaddles = () => {
-  //takes position data from <Input /> and uses it to update paddle position
     let cell = this.state.cell, pad = this.state.paddles,
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
@@ -287,7 +289,6 @@ state = {
 
   componentDidMount() {
     this.setGame()
-    //window.addEventListener('resize', this.sizeGame) //replace with rotate
     window.setInterval(this.animate, 10)
   }
 
@@ -308,11 +309,13 @@ state = {
     } else if (this.props.shuffling === true) {
       this.pickPaddles()
       this.props.shuffle()
+    } else if (this.state.svg.w !== this.props.w
+      || this.state.svg.h !== this.props.h) {
+      this.sizeGame()
     }
   }
 
   componentWillUnmount() {
-    //window.removeEventListener('resize', this.sizeGame) //replace with rotate
     window.clearInterval(window.setInterval(this.animate, 10))
   }
 

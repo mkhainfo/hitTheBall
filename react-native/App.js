@@ -11,16 +11,14 @@ import Game from './game/Game.js';
     'Shake or press menu button for dev menu',
 });*/
 
-/*install notes
-  warning " > react-native@0.57.6" has incorrect peer dependency "react@16.6.1".
-
-*/
 const getSize = x => {
   const { width, height } = Dimensions.get('window')
   return x === 'w' ? width : height
 }
 
 type AppState = {
+  w: number,
+  h: number,
   score: any,
   stage: number,
   x: number,
@@ -30,11 +28,20 @@ type AppState = {
 
 export default class App extends Component<{}, AppState> {
   state = {
+    w: getSize('w'),
+    h: getSize('h'),
     score: 'hit the ball',
     stage: 0,
     x: 0,
     y: 0,
     shuffle: false,
+  }
+
+  onLayout = (e: ViewLayoutEvent) => {
+    this.setState({
+      w: Math.floor(e.nativeEvent.layout.width),
+      h: Math.floor(e.nativeEvent.layout.height),
+    })
   }
 
   getScore = (score: any) => {
@@ -57,10 +64,13 @@ export default class App extends Component<{}, AppState> {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Input stage={this.state.stage} nextStage={this.nextStage}
+      <View style={styles.container} onLayout={this.onLayout}>
+        <Input
+          w={this.state.w} h={this.state.h}
+          stage={this.state.stage} nextStage={this.nextStage}
           pos={this.getPosition} shuffle={this.shuffle} />
         <Game fill='#eeeeee'
+          w={this.state.w} h={this.state.h}
           score={this.getScore}
           stage={this.state.stage} nextStage={this.nextStage}
           x={this.state.x} y={this.state.y}
@@ -72,16 +82,16 @@ export default class App extends Component<{}, AppState> {
 }
 
 type inputProps = {
+  w: number,
+  h: number,
   stage: number,
   nextStage: (stage?: number) => void,
   pos: (x: number, y: number) => void,
   shuffle: void => void,
 }
 
-class Input extends Component< inputProps,{txt: string}> {
-  state = {
-    txt: 'no'
-  }
+class Input extends Component< inputProps,{}> {
+  state = {}
 
   onStartShouldSetResponder = e => true
 
@@ -96,13 +106,10 @@ class Input extends Component< inputProps,{txt: string}> {
       this.props.nextStage()
     } else {this.props.shuffle()}
     }
-    /// THIS WILL COLLECT DATA FROM INPUTS AND SEND IT TO THE App
-    /// THE APP WILL THEN SEND THIS DATA TO THE GAME Component
-    /// THE GAME COMPONENT WILL UPDATE THE POSITION OF THE PADDLES
-    /// onLayout={}
+
   render() {
     return (
-      <View style={styles.input}
+      <View style={styles.input} width={this.props.w} height={this.props.h}
         onStartShouldSetResponder={this.onStartShouldSetResponder}
         onResponderMove={this.changePos}
         onResponderRelease={this.shuffle}
@@ -134,8 +141,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'cyan',
     zIndex: 5,
     position: 'absolute',
-    width: getSize('w'),
-    height: getSize('h'),
     opacity: 0,
   },
 });
