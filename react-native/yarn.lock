@@ -4756,10 +4756,10 @@ react-dom@^16.6.3:
     prop-types "^15.6.2"
     scheduler "^0.11.2"
 
-react-is@^16.6.1:
-  version "16.6.3"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.6.3.tgz#d2d7462fcfcbe6ec0da56ad69047e47e56e7eac0"
-  integrity sha512-u7FDWtthB4rWibG/+mFbVd5FvdI20yde86qKGx4lVUTWmPlSWQ4QxbBIrrs+HnXGbxOUlUzTAP/VDmvCwaP2yA==
+react-is@^16.6.3:
+  version "16.7.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.7.0.tgz#c1bd21c64f1f1364c6f70695ec02d69392f41bfa"
+  integrity sha512-Z0VRQdF4NPDoI0tsXVMLkJLiwEBa+RP66g0xDHxgxysxSoCUccSten4RTF/UFvZF1dZvZ9Zu1sx+MDXwcOR34g==
 
 react-native-hooks@0.0.6:
   version "0.0.6"
@@ -4793,10 +4793,10 @@ react-native-web@^0.9.9:
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.3"
 
-react-native@0.57.6:
-  version "0.57.6"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.57.6.tgz#517a5df8a635e9f465abec1e47d7d66b0e206c06"
-  integrity sha512-9iDjfoJcF4mWP86F3hAj0sdjIPXR262r1QeHUJwR7oF6s5DAMDCkndpKOawHcDE9vBrpVeu86erbIog+5b2DCg==
+react-native@0.57.8:
+  version "0.57.8"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.57.8.tgz#1a840fbe144cd3902cc14313a783ce28efc48cb9"
+  integrity sha512-K6DAMTPTq+lxVYC73y4Kh/bgLajddBaIKzwsVeV4JOoS1Fdq48/ISXD3vApV+x+/IBVTXnrT9qlA+9U6MMZCqA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     absolute-path "^0.0.0"
@@ -4846,7 +4846,7 @@ react-native@0.57.6:
     serve-static "^1.13.1"
     shell-quote "1.6.1"
     stacktrace-parser "^0.1.3"
-    ws "^1.1.0"
+    ws "^1.1.5"
     xcode "^1.0.0"
     xmldoc "^0.4.0"
     yargs "^9.0.0"
@@ -4859,15 +4859,15 @@ react-proxy@^1.1.7:
     lodash "^4.6.1"
     react-deep-force-update "^1.0.0"
 
-react-test-renderer@16.6.1:
-  version "16.6.1"
-  resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.6.1.tgz#8ea357652be3cf81cbd6b2f686e74ebe67c17b78"
-  integrity sha512-sgZwJZYIgQptRi2qk5+gB8FBQGk4gLSs0gmKZPMfhd3dLkdxIUwVLHteLN3Bnj4LokIZd3U+V2NEJUqeV2PT2w==
+react-test-renderer@16.6.3:
+  version "16.6.3"
+  resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.6.3.tgz#5f3a1a7d5c3379d46f7052b848b4b72e47c89f38"
+  integrity sha512-B5bCer+qymrQz/wN03lT0LppbZUDRq6AMfzMKrovzkGzfO81a9T+PWQW6MzkWknbwODQH/qpJno/yFQLX5IWrQ==
   dependencies:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
-    react-is "^16.6.1"
-    scheduler "^0.11.0"
+    react-is "^16.6.3"
+    scheduler "^0.11.2"
 
 react-timer-mixin@^0.13.2, react-timer-mixin@^0.13.3:
   version "0.13.4"
@@ -5233,7 +5233,7 @@ sax@~1.1.1:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.1.6.tgz#5d616be8a5e607d54e114afae55b7eaf2fcc3240"
   integrity sha1-XWFr6KXmB9VOEUr65Vt+ry/MMkA=
 
-scheduler@^0.11.0, scheduler@^0.11.2:
+scheduler@^0.11.2:
   version "0.11.3"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.3.tgz#b5769b90cf8b1464f3f3cfcafe8e3cd7555a2d6b"
   integrity sha512-i9X9VRRVZDd3xZw10NY5Z2cVMbdYg6gqFecfj79USv1CFN+YrJ3gIPRKf1qlY+Sxly4djoKdfx1T+m9dnRB8kQ==
@@ -6077,7 +6077,7 @@ write-file-atomic@^2.1.0:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.2"
 
-ws@^1.1.0:
+ws@^1.1.0, ws@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/ws/-/ws-1.1.5.tgz#cbd9e6e75e09fc5d2c90015f21f0c40875e0dd51"
   integrity sha512-o3KqipXNUdS7wpQzBHSe180lBGO60SoK0yVo3CYJgb2MkobuWuBX6dhkYP5ORCLd55y+SaflMOV5fqAB53ux4w==
