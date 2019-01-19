@@ -32,20 +32,9 @@ export default class Game extends Component {
     this.setState({ svg: svg })
   }
 
-  setCell = ( size ) => {
-
-    if (size === undefined) {
-      if (this.state.score < 2) {
-        size = 9.5
-      } else if (this.state.score < 5) {
-        size = 9
-      } else if (this.state.score < 6) {
-        size = 8.5
-      } else { size = 6 }
-    }
-
-    size /= 10
-    let w = this.state.svg.w * size, h = this.state.svg.h * size,
+  setCell = () => {
+    let size = 8 / 10,
+      w = this.state.svg.w * size, h = this.state.svg.h * size,
     cell = update(this.state.cell, {
       w: {$set: w},
       h: {$set: h},
@@ -54,16 +43,6 @@ export default class Game extends Component {
       size: {$set: size},
     })
     this.setState({cell: cell})
-  }
-
-  checkRange = ( size ) => {
-    size /= 10
-    let cell = this.state.cell, ball = this.state.ball,
-        w = cell.w * size, h = cell.h * size
-
-        return (ball.x > cell.x + ball.r && ball.x < cell.x + w - ball.r)
-          && (ball.y > cell.y + ball.r && ball.y < cell.y + h - ball.r)?
-          true : false
   }
 
   setPaddles = () => {
@@ -80,24 +59,6 @@ export default class Game extends Component {
             length: {$set: svg.h * length},
             left: {x: {$set: cell.x},},
             right: {x: {$set: cell.x + cell.w - depth},},
-          },
-        })
-    this.setState({paddles: ready})
-  }
-
-  adjustPaddles = ( size ) => {
-    size /= 10
-    let svg = this.state.svg, paddles = this.state.paddles,
-        w = svg.w * size, h = svg.h * size,
-        x = (svg.w - w) / 2, y = (svg.h - h) / 2,
-        ready = update(paddles, {
-          x: {
-            top: {y: {$set: y},},
-            bottom: {y: {$set: y + h - paddles.depth}, },
-          },
-          y: {
-            left: {x: {$set: x},},
-            right: {x: {$set: x + w - paddles.depth},},
           },
         })
     this.setState({paddles: ready})
@@ -232,8 +193,8 @@ export default class Game extends Component {
       halfX = pad.x.length / 2, halfY = pad.y.length / 2,
       rightBound = cell.x + cell.w - halfX,
       lowerBound = cell.y + cell.h - halfY,
-      //x = this.props.x, y = this.props.y // manual <Input />
-      x = this.state.ball.x, y = this.state.ball.y // automated paddles
+      x = this.props.x, y = this.props.y // manual <Input />
+      //x = this.state.ball.x, y = this.state.ball.y // automated paddles
 
     x = x < cell.x + halfX ? cell.x : x > rightBound ? rightBound - halfX : x - halfX
     y = y < cell.y + halfY ? cell.y : y > lowerBound ? lowerBound - halfY : y - halfY
@@ -290,11 +251,6 @@ export default class Game extends Component {
     } else if (this.props.shuffling === true) {
       this.pickPaddles()
       this.props.shuffle()
-    } else if ( this.state.score >= 1 && this.state.cell.size === 0.95 && this.checkRange(6) ) {
-      this.setCell(1.5)
-      this.adjustPaddles(1.5)
-      this.props.score(':)')
-      this.setState({score: ':)'})
     }
   }
 
@@ -304,8 +260,7 @@ export default class Game extends Component {
   }
 
   render() {
-    let s = this.state
-    let pad = this.state.paddles
+    let s = this.state, pad = this.state.paddles
     return(
       <svg
         width={ s.svg.w } height={ s.svg.h }
@@ -314,7 +269,7 @@ export default class Game extends Component {
         <rect id='cell'
           width={ s.cell.w } height={ s.cell.h }
           x={ s.cell.x } y={ s.cell.y }
-          fillOpacity={ s.cell.size } />
+          fillOpacity={ 1 } />
 
         <circle id='ball'
           cx={ s.ball.x } cy={ s.ball.y }
